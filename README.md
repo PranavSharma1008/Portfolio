@@ -33,13 +33,13 @@ Version Control	         Git & GitHub
 
 Feel free to reach out through any of the channels below:
 
-Email: pranav2410991479@gmail.com
-LinkedIn: https://www.linkedin.com/in/pranav-sharma-28bb54368/?isSelfProfile=false
-GitHub: https://github.com/PranavSharma1008
+- Email: pranav2410991479@gmail.com
+- LinkedIn: https://www.linkedin.com/in/pranav-sharma-28bb54368/?isSelfProfile=false
+- GitHub: https://github.com/PranavSharma1008
 
 📄 License
 
 This project is open source and available under the MIT License.
 
 
-Built By Pranav Sharma .. 
+Built By Pranav Sharma !!
