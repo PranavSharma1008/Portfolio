@@ -26,7 +26,8 @@ const projects = [
     description: 'A personal portfolio website built with React and Framer Motion featuring smooth animations and a particle canvas background.',
     tech: ['React', 'Vite', 'Framer Motion', 'JavaScript', 'CSS'],
     image: portfolioScreenshot,
-    github: 'https://github.com/PranavSharma1008/Portfolio'
+    github: 'https://github.com/PranavSharma1008/Portfolio',
+    live: 'https://pranavsharmaportfolio.netlify.app/'
   }
 ]
 
