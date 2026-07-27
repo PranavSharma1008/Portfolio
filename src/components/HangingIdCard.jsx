@@ -23,10 +23,20 @@ const Lanyard = ({ length, color }) => {
   )
 }
 
+const getFormattedDate = () => {
+  const now = new Date()
+  const day = String(now.getDate()).padStart(2, '0')
+  const month = now.toLocaleString('en-US', { month: 'short' }).toUpperCase()
+  const year = now.getFullYear()
+  return `${day} ${month} ${year}`
+}
+
 const HangingIdCard = ({
   name = 'Pranav Sharma',
-  role = 'Software Engineering Fresher',
-  badgeId = 'PS-2025',
+  role = 'Software Engineer',
+  email = 'pranav2410991479@gmail.com',
+  phone = '+91 9317290976',
+  badgeId = getFormattedDate(),
   accentColor = '#2563EB',
   ropeColor = '#4a5568',
   ropeLength = 150,
@@ -38,6 +48,20 @@ const HangingIdCard = ({
   const isDraggingRef = useRef(false)
 
   const [angle, setAngle] = useState(0)
+  const [effectiveRopeLength, setEffectiveRopeLength] = useState(ropeLength)
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setEffectiveRopeLength(90)
+      } else {
+        setEffectiveRopeLength(ropeLength)
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [ropeLength])
 
   const dragStartX = useRef(0)
   const dragAngle0 = useRef(0)
@@ -49,7 +73,7 @@ const HangingIdCard = ({
 
     const s = physRef.current
     if (!isDraggingRef.current) {
-      const L = ropeLength + 100
+      const L = effectiveRopeLength + 100
       const torque =
         -(GRAVITY / L) * Math.sin(s.angle) -
         (DAMPING / MASS) * s.vel -
@@ -74,7 +98,7 @@ const HangingIdCard = ({
       prevAngleRef.current = s.angle
       rafRef.current = requestAnimationFrame(tick)
     }
-  }, [ropeLength])
+  }, [effectiveRopeLength])
 
   const startPhysics = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current)
@@ -96,12 +120,12 @@ const HangingIdCard = ({
   const onPointerMove = useCallback((e) => {
     if (!isDraggingRef.current) return
     const dx = e.clientX - dragStartX.current
-    const L = ropeLength + 100
+    const L = effectiveRopeLength + 100
     const newAngle = dragAngle0.current - dx / L
     const clamped = Math.max(-1.4, Math.min(1.4, newAngle))
     physRef.current.angle = clamped
     setAngle(clamped)
-  }, [ropeLength])
+  }, [effectiveRopeLength])
 
   const onPointerUp = useCallback((e) => {
     e.currentTarget.releasePointerCapture(e.pointerId)
@@ -120,7 +144,7 @@ const HangingIdCard = ({
   const cardRotateDeg = angle * (180 / Math.PI)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', userSelect: 'none', touchAction: 'none' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', userSelect: 'none', touchAction: 'pan-y' }}>
       <div
         style={{
           width: '14px', height: '14px', borderRadius: '50%',
@@ -144,12 +168,12 @@ const HangingIdCard = ({
         onClick={onCardClick}
       >
         <div style={{ pointerEvents: 'none' }}>
-          <Lanyard length={ropeLength} color={ropeColor} />
+          <Lanyard length={effectiveRopeLength} color={ropeColor} />
         </div>
 
           <div
             style={{
-            position: 'relative', width: '280px', borderRadius: '18px',
+            position: 'relative', width: '280px', maxWidth: '85vw', borderRadius: '18px',
             overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
             border: '1px solid rgba(255,255,255,0.2)',
             background: 'white', pointerEvents: 'none', marginTop: '-2px',
@@ -196,6 +220,21 @@ const HangingIdCard = ({
               <p style={{ fontSize: '13px', color: '#71717a', fontWeight: 500, margin: 0 }}>
                 {role}
               </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
+                <p style={{ fontSize: '10px', color: '#52525b', margin: 0, fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </svg>
+                  {email}
+                </p>
+                <p style={{ fontSize: '10px', color: '#52525b', margin: 0, fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10">
+                    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                  </svg>
+                  {phone}
+                </p>
+              </div>
 
               <div style={{ margin: '10px 0', width: '100%', borderTop: '1px solid #f4f4f5' }} />
 

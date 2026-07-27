@@ -152,6 +152,7 @@ const InteractiveGridBackground = ({
     <>
       <div
         ref={containerRef}
+        aria-hidden="true"
         style={{
           position: 'fixed', inset: 0, zIndex: -1,
           width: width || '100vw', height: height || '100vh',
@@ -159,6 +160,7 @@ const InteractiveGridBackground = ({
       >
         <canvas
           ref={canvasRef}
+          aria-hidden="true"
           style={{
             position: 'absolute', top: 0, left: 0, zIndex: 0,
             pointerEvents: 'none',

@@ -9,6 +9,8 @@ import Footer from './components/Footer'
 import InteractiveGridBackground from './components/InteractiveGridBackground'
 import MagicLoader from './components/MagicLoader'
 import ThemeProvider from './components/ThemeProvider'
+import ScrollToTop from './components/ScrollToTop'
+import ScrollProgress from './components/ScrollProgress'
 
 function App() {
   const [activeSection, setActiveSection] = useState('home')
@@ -37,6 +39,7 @@ function App() {
 
   return (
     <>
+      <ScrollProgress />
       <MagicLoader size={250} particleCount={2} speed={1.2} hueRange={[200, 280]} />
       <ThemeProvider>
       <InteractiveGridBackground
@@ -56,6 +59,7 @@ function App() {
           <Contact />
       </main>
         <Footer />
+        <ScrollToTop />
       </InteractiveGridBackground>
       </ThemeProvider>
     </>

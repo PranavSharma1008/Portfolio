@@ -30,6 +30,19 @@ const Contact = () => {
           <div className="contact-links">
             <MagneticButton
               as="a"
+              href="tel:+919317290976"
+              variant="primary"
+              size="md"
+              className="contact-btn phone"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+              +91 9317290976
+            </MagneticButton>
+
+            <MagneticButton
+              as="a"
               href="https://mail.google.com/mail/?view=cm&fs=1&to=pranav2410991479@gmail.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -40,7 +53,7 @@ const Contact = () => {
               <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
                 <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
               </svg>
-              Email
+              pranav2410991479@gmail.com
             </MagneticButton>
 
             <MagneticButton

@@ -108,7 +108,7 @@ const ProjectsSlider = () => {
                 <motion.div
                   key={`${project.title}-${index}`}
                   className={`slider-card ${isSelected ? 'selected' : ''}`}
-                  style={{ transformStyle: 'preserve-3d', width: '360px', minHeight: '450px' }}
+                  style={{ transformStyle: 'preserve-3d', width: '360px', maxW: '90vw', minHeight: '450px' }}
                   animate={{
                     rotateY: isSelected ? 0 : 20,
                     scale: isSelected ? 1.05 : 1,
@@ -117,6 +117,7 @@ const ProjectsSlider = () => {
                   transition={{ type: 'spring', mass: 3, stiffness: 400, damping: 50 }}
                   onMouseEnter={() => setHoveredIndex(originalIndex)}
                   onMouseLeave={() => setHoveredIndex(null)}
+                  onClick={() => setHoveredIndex(isSelected ? null : originalIndex)}
                 >
                   <div className="slider-card-inner">
                     <img
@@ -124,17 +125,15 @@ const ProjectsSlider = () => {
                       alt={project.title}
                       className="slider-card-image"
                     />
-                    {isSelected && (
-                      <div className="slider-card-overlay" onMouseLeave={() => setHoveredIndex(null)}>
-                        <h3 className="slider-card-title">{project.title}</h3>
-                        <p className="slider-card-desc">{project.description}</p>
-                        <div className="slider-card-tech">
-                          {project.tech.map((t, i) => (
-                            <span key={i} className="slider-tech-tag">{t}</span>
-                          ))}
-                        </div>
+                    <div className={`slider-card-overlay ${isSelected ? 'active' : ''}`}>
+                      <h3 className="slider-card-title">{project.title}</h3>
+                      <p className="slider-card-desc">{project.description}</p>
+                      <div className="slider-card-tech">
+                        {project.tech.map((t, i) => (
+                          <span key={i} className="slider-tech-tag">{t}</span>
+                        ))}
                       </div>
-                    )}
+                    </div>
                   </div>
                   <div className="slider-card-label">{project.title}</div>
                   <div className="slider-card-links">

@@ -5,7 +5,7 @@ import { useThemeProgress } from './ThemeProvider'
 
 const badges = [
   'Open to Work',
-  'Fresher'
+  'Software Engineer'
 ]
 
 const navLinks = [
@@ -102,6 +102,8 @@ const Header = ({ activeSection }) => {
           className={`nav-toggle ${isMenuOpen ? 'active' : ''}`}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle navigation"
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-nav-menu"
         >
           <span className="hamburger"></span>
         </button>
@@ -165,7 +167,7 @@ const Header = ({ activeSection }) => {
           </div>
         </div>
 
-        <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
+        <ul id="mobile-nav-menu" className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
           {navLinks.map((link) => (
             <li key={link.id}>
               <a
@@ -184,6 +186,11 @@ const Header = ({ activeSection }) => {
               </a>
             </li>
           ))}
+          <li className="mobile-theme-toggle-item">
+            <button className="mobile-theme-btn" onClick={toggle} aria-label="Toggle Theme">
+              {progress > 0.5 ? '☀️ Light Mode' : '🌙 Dark Mode'}
+            </button>
+          </li>
         </ul>
       </nav>
       

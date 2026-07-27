@@ -46,7 +46,7 @@ const Experience = () => {
               </svg>
             </div>
             <div className="experience-details">
-              <h3>Software Engineering Fresher</h3>
+              <h3>Software Engineer</h3>
               <p className="experience-subtitle">Recent Graduate | Ready to Contribute</p>
               <p className="experience-description">
                 As a fresh graduate, I bring a strong academic foundation in core computer science concepts.

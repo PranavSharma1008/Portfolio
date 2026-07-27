@@ -41,7 +41,7 @@ const Hero = () => {
             threshold={0.3}
             duration={0.5}
           >
-            A passionate Software Engineering Fresher with a solid foundation in Data Structures & Algorithms, Object-Oriented Programming, Computer Networks, Operating Systems, and Database Management. I thrive on solving complex problems and building efficient, scalable solutions with a growth mindset.
+            A passionate Software Engineer with a solid foundation in Data Structures & Algorithms, Object-Oriented Programming, Computer Networks, Operating Systems, and Database Management. I thrive on solving complex problems and building efficient, scalable solutions with a growth mindset.
           </ScrollReveal>
         </motion.div>
 
