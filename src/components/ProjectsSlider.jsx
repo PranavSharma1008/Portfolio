@@ -5,6 +5,7 @@ import flashdropScreenshot from '../assets/flashdrop-screenshot.png'
 import bloodyIcon from '../assets/bloody-icon.png'
 import bloodoceanIcon from '../assets/bloodocean-icon.png'
 import portfolioScreenshot from '../assets/portfolio-screenshot.png'
+import campsfixScreenshot from '../assets/campsfix-screenshot.png'
 
 const projects = [
   {
@@ -28,6 +29,13 @@ const projects = [
     image: portfolioScreenshot,
     github: 'https://github.com/PranavSharma1008/Portfolio',
     live: 'https://pranavsharmaportfolio.netlify.app/'
+  },
+  {
+    title: 'CampsFix',
+    description: '',
+    tech: [],
+    image: campsfixScreenshot,
+    github: 'https://github.com/PranavSharma1008/CampusFix'
   }
 ]
 
@@ -45,7 +53,7 @@ const ProjectsSlider = () => {
   useEffect(() => {
     const calculateWidth = () => {
       const cardW = 360
-      const gap = 20
+      const gap = 40
       const calculatedWidth = (cardW + gap) * projects.length
       setWidth(calculatedWidth)
     }
@@ -108,7 +116,7 @@ const ProjectsSlider = () => {
                 <motion.div
                   key={`${project.title}-${index}`}
                   className={`slider-card ${isSelected ? 'selected' : ''}`}
-                  style={{ transformStyle: 'preserve-3d', width: '360px', maxW: '90vw', minHeight: '450px' }}
+                  style={{ transformStyle: 'preserve-3d', width: '360px', maxWidth: '90vw', minHeight: '230px' }}
                   animate={{
                     rotateY: isSelected ? 0 : 20,
                     scale: isSelected ? 1.05 : 1,
