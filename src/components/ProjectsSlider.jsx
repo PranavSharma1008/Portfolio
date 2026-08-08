@@ -32,8 +32,8 @@ const projects = [
   },
   {
     title: 'CampsFix',
-    description: '',
-    tech: [],
+    description: 'A modern full-stack campus management platform for issue reporting and lost & found workflows, built with Spring Boot + Java 17 + React + MongoDB.',
+    tech: ['Spring Boot', 'Java 17', 'React', 'MongoDB', 'Tailwind CSS'],
     image: campsfixScreenshot,
     github: 'https://github.com/PranavSharma1008/CampusFix'
   }
