@@ -58,7 +58,7 @@ function App() {
       <div className="scanlines" />
       <Header activeSection={activeSection} />
       <main>
-        <Hero />
+        <Hero key={isLoading ? 'hero-loading' : 'hero-active'} />
         <Experience />
         <Projects />
         <Achievements />
