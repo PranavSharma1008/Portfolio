@@ -1,101 +1,84 @@
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, useMotionValue } from 'framer-motion'
-import SparkleNavbar from './SparkleNavbar'
-import { useThemeProgress } from './ThemeProvider'
-
-const badges = [
-  'Open to Work',
-  'Software Engineer'
-]
+import { useState, useEffect } from 'react'
 
 const navLinks = [
-  { id: 'home', label: 'Home' },
-  { id: 'experience', label: 'Experience' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'achievements', label: 'Achievements' },
-  { id: 'contact', label: 'Contact' }
+  { id: 'home', label: 'home', cmd: 'cd ~' },
+  { id: 'experience', label: 'experience', cmd: 'cat experience.md' },
+  { id: 'projects', label: 'projects', cmd: 'ls -la projects/' },
+  { id: 'achievements', label: 'achievements', cmd: 'cat awards.txt' },
+  { id: 'contact', label: 'contact', cmd: 'mail -s "Hello" pranav@email.com' }
 ]
 
-const nameList = [
-  { text: 'प्रणव शर्मा', lang: 'Hindi' },
-  { text: 'Pranav Sharma', lang: 'English' },
-  { text: 'ਪ੍ਰਣਵ ਸ਼ਰਮਾ', lang: 'Punjabi' },
-]
+const SunIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+    <circle cx="12" cy="12" r="5" />
+    <line x1="12" y1="1" x2="12" y2="3" />
+    <line x1="12" y1="21" x2="12" y2="23" />
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+    <line x1="1" y1="12" x2="3" y2="12" />
+    <line x1="21" y1="12" x2="23" y2="12" />
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+  </svg>
+)
+
+const MoonIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+)
 
 const Header = ({ activeSection }) => {
-  const { progress, toggle, y, trackRange } = useThemeProgress()
-  const [currentBadgeIndex, setCurrentBadgeIndex] = useState(0)
-  const [nameIndex, setNameIndex] = useState(0)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const sliderX = useMotionValue(0)
-  const sliderTrackRef = useRef(null)
+  const [currentTime, setCurrentTime] = useState('')
+  const [isDark, setIsDark] = useState(true)
 
   useEffect(() => {
-    const nameInterval = setInterval(() => {
-      setNameIndex((prev) => (prev + 1) % nameList.length)
-    }, 2500)
-    return () => clearInterval(nameInterval)
-  }, [])
-
-  useEffect(() => {
-    const track = sliderTrackRef.current
-    if (!track) return
-    const maxX = track.offsetWidth - 32
-    sliderX.set(progress * maxX)
-  }, [progress, sliderX])
-
-  useEffect(() => {
-    const badgeInterval = setInterval(() => {
-      setCurrentBadgeIndex((prev) => (prev + 1) % badges.length)
-    }, 2000)
-    
-    return () => {
-      clearInterval(badgeInterval)
+    const saved = localStorage.getItem('theme')
+    if (saved === 'light') {
+      setIsDark(false)
+      document.documentElement.classList.add('light')
     }
   }, [])
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+    const updateTime = () => {
+      const now = new Date()
+      setCurrentTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }))
     }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    updateTime()
+    const interval = setInterval(updateTime, 1000)
+    return () => clearInterval(interval)
   }, [])
+
+  const toggleTheme = () => {
+    const newDark = !isDark
+    setIsDark(newDark)
+    if (newDark) {
+      document.documentElement.classList.remove('light')
+      localStorage.setItem('theme', 'dark')
+    } else {
+      document.documentElement.classList.add('light')
+      localStorage.setItem('theme', 'light')
+    }
+  }
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id)
     if (element) {
-      const headerHeight = 72
+      const headerHeight = 64
       const offsetTop = element.offsetTop - headerHeight
       window.scrollTo({ top: offsetTop, behavior: 'smooth' })
     }
     setIsMenuOpen(false)
   }
 
-  const handleNavChange = (index) => {
-    const sectionId = navLinks[index].id
-    scrollToSection(sectionId)
-  }
-
-  const activeIndex = navLinks.findIndex(l => l.id === activeSection)
-
   return (
-    <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
+    <header className="header">
       <nav className="navbar container">
         <div className="nav-brand">
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={nameIndex}
-              className="brand-text"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-            >
-              {nameList[nameIndex].text}
-            </motion.span>
-          </AnimatePresence>
+          <span className="brand-prefix">PranavSharma@portfolio</span>
+          <span className="brand-text">:~$</span>
         </div>
 
         <button
@@ -103,117 +86,44 @@ const Header = ({ activeSection }) => {
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle navigation"
           aria-expanded={isMenuOpen}
-          aria-controls="mobile-nav-menu"
         >
           <span className="hamburger"></span>
         </button>
 
-        <div className="sparkle-nav-desktop">
-          <SparkleNavbar
-            items={navLinks.map(l => l.label)}
-            rightItems={[]}
-            color="#000000"
-            onNavigate={handleNavChange}
-            activeIndex={activeIndex}
-          />
-          <div className="theme-slider-nav">
-            <svg className="slider-icon sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-            <div
-              className="slider-track"
-              ref={sliderTrackRef}
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect()
-                const w = rect.width
-                const thumbW = 32
-                const clickX = e.clientX - rect.left
-                const pct = Math.max(0, Math.min(1, clickX / w))
-                const newX = pct * (w - thumbW)
-                sliderX.set(newX)
-                if (y) y.set(pct * trackRange)
-              }}
-            >
-              <div className="slider-fill" style={{ width: `${progress * 100}%` }} />
-              <motion.div
-                className="slider-thumb"
-                drag="x"
-                dragElastic={0}
-                dragMomentum={false}
-                dragConstraints={{ left: 0, right: 48 }}
-                style={{ x: sliderX, y: '-50%' }}
-                onDrag={(_, info) => {
-                  const track = sliderTrackRef.current
-                  if (!track || !y) return
-                  const w = track.offsetWidth
-                  const thumbW = 32
-                  const maxX = w - thumbW
-                  const newX = Math.max(0, Math.min(maxX, sliderX.get() + info.delta.x))
-                  sliderX.set(newX)
-                  y.set((newX / maxX) * trackRange)
-                }}
-                onPointerDown={(e) => e.stopPropagation()}
-              >
-                <div className="slider-thumb-inner" />
-              </motion.div>
-            </div>
-            <svg className="slider-icon moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          </div>
-        </div>
-
-        <ul id="mobile-nav-menu" className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
+        <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
           {navLinks.map((link) => (
             <li key={link.id}>
-              <a
-                href={`#${link.id}`}
+              <button
+                onClick={() => scrollToSection(link.id)}
                 className={`nav-link ${activeSection === link.id ? 'active' : ''}`}
-                onClick={(e) => { e.preventDefault(); scrollToSection(link.id) }}
               >
+                <span className="nav-prefix">{activeSection === link.id ? '>' : ' '}</span>
                 {link.label}
-                {activeSection === link.id && (
-                  <motion.div
-                    className="nav-underline"
-                    layoutId="nav-underline"
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  />
-                )}
-              </a>
+              </button>
             </li>
           ))}
-          <li className="mobile-theme-toggle-item">
-            <button className="mobile-theme-btn" onClick={toggle} aria-label="Toggle Theme">
-              {progress > 0.5 ? '☀️ Light Mode' : '🌙 Dark Mode'}
+          <li className="mobile-only">
+            <button className="theme-toggle-mobile" onClick={toggleTheme} aria-label="Toggle theme">
+              {isDark ? <SunIcon /> : <MoonIcon />}
             </button>
           </li>
         </ul>
-      </nav>
-      
-      <motion.div 
-        className="fresher-badge"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 20 }}
-        whileHover={{ scale: 1.03 }}
-      >
-        <span className="badge-dot"></span>
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={currentBadgeIndex}
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+
+        <div className="nav-right">
+          <button
+            className="theme-toggle-icon"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
           >
-            {badges[currentBadgeIndex]}
-          </motion.span>
-        </AnimatePresence>
-      </motion.div>
+            {isDark ? <SunIcon /> : <MoonIcon />}
+          </button>
+          <div className="status-indicator">
+            <span className="status-dot"></span>
+            <span>online</span>
+          </div>
+          <span className="nav-time">{currentTime}</span>
+        </div>
+      </nav>
     </header>
   )
 }

@@ -6,13 +6,11 @@ import Projects from './components/Projects'
 import Achievements from './components/Achievements'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
-import InteractiveGridBackground from './components/InteractiveGridBackground'
-import MagicLoader from './components/MagicLoader'
-import ThemeProvider from './components/ThemeProvider'
 import ScrollToTop from './components/ScrollToTop'
-import ScrollProgress from './components/ScrollProgress'
+import TerminalLoader from './components/TerminalLoader'
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true)
   const [activeSection, setActiveSection] = useState('home')
 
   useEffect(() => {
@@ -37,31 +35,37 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    const cursorGlow = document.createElement('div')
+    cursorGlow.className = 'cursor-glow'
+    document.body.appendChild(cursorGlow)
+
+    const handleMouseMove = (e) => {
+      cursorGlow.style.left = e.clientX + 'px'
+      cursorGlow.style.top = e.clientY + 'px'
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      document.body.removeChild(cursorGlow)
+    }
+  }, [])
+
   return (
     <>
-      <ScrollProgress />
-      <MagicLoader size={250} particleCount={2} speed={1.2} hueRange={[200, 280]} />
-      <ThemeProvider>
-      <InteractiveGridBackground
-        gridSize={40}
-        trailLength={4}
-        idleSpeed={0.3}
-        idleRandomCount={8}
-        fadeIntensity={15}
-        glowRadius={25}
-      >
-        <Header activeSection={activeSection} />
-        <main>
-          <Hero />
-          <Experience />
-          <Projects />
-          <Achievements />
-          <Contact />
+      {isLoading && <TerminalLoader onComplete={() => setIsLoading(false)} />}
+      <div className="scanlines" />
+      <Header activeSection={activeSection} />
+      <main>
+        <Hero />
+        <Experience />
+        <Projects />
+        <Achievements />
+        <Contact />
       </main>
-        <Footer />
-        <ScrollToTop />
-      </InteractiveGridBackground>
-      </ThemeProvider>
+      <Footer />
+      <ScrollToTop />
     </>
   )
 }
