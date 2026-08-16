@@ -14,11 +14,14 @@
 
 ## ✨ Features & Highlights
 
-- **🎴 Interactive 3D Physics ID Card**: Drag and swing 3D interactive physics-based ID card lanyard built with custom physics hooks.
-- **🌀 3D Rotating Project Slider**: Infinite smooth auto-scrolling 3D card carousel with interactive tilt and hover depth overlays.
-- **✨ Particle Grid Canvas**: Interactive mouse-following neon grid background canvas with dynamic particle trails.
-- **📱 Fully Responsive**: Fluid layouts crafted with CSS variables and responsive design best practices across mobile, tablet, and desktop.
-- **⚡ High Performance**: Powered by Vite for lightning-fast HMR and optimized production bundles.
+- **💻 Interactive Terminal Login Intro (`auth.sh`)**: Realistic retro bash terminal startup sequence on initial login that automatically types credentials (`login: Pranavsharma`, `Password: ******`), authenticates, and unlocks the workspace.
+- **☀️ Light Mode by Default**: Clean, modern light theme by default with seamless one-click dark/light mode toggle.
+- **⚡ Synchronized Typing Animations**: Sequential character-by-character headline typing animations (`// Hello, World!` → `Pranav Sharma`) that trigger smoothly after login.
+- **🌀 3D Rotating Projects Carousel**: Infinite auto-scrolling 3D card carousel with interactive tilt, depth parallax, and live project screenshots.
+- **🎴 Terminal Profile Card**: Sleek bash profile window with developer info, avatar, and live status indicator.
+- **✨ Scanlines & Interactive Cursor Glow**: Subtle CRT scanlines and mouse-following ambient lighting effects.
+- **📱 Fully Responsive**: Pixel-perfect layout adaptation across desktop, tablet, and mobile devices.
+- **⚡ Fast Performance**: Built with React 18, Vite 5, and Framer Motion for ultra-fast load times and 60fps animations.
 
 ---
 
@@ -49,7 +52,7 @@
 ---
 
 ### 4. 🌐 Portfolio Website
-> A personal portfolio website built with React and Framer Motion featuring smooth animations and a particle canvas background.
+> A modern developer portfolio built with React and Framer Motion featuring an interactive terminal login intro, smooth typing animations, and 3D project cards.
 
 - **Tech Stack**: `React` | `Vite` | `Framer Motion` | `JavaScript` | `CSS3`
 - **Live Demo**: [pranavsharmaportfolio.netlify.app](https://pranavsharmaportfolio.netlify.app/)
@@ -61,11 +64,12 @@
 
 | Category | Core Skills & Technologies |
 | :--- | :--- |
-| **Frontend** | React, JavaScript (ES6+), HTML5, CSS3, Framer Motion, Vite |
-| **Backend & Systems** | Node.js, Spring Boot, Java 17, Flask, Python, TCP Sockets, Express |
-| **Databases** | MongoDB |
-| **Realtime & Tools** | Socket.IO, WebSockets, JWT, Leaflet Maps, Git & GitHub |
-| **CS Fundamentals** | Data Structures & Algorithms (DSA), OOPs, DBMS, Operating Systems, Computer Networks |
+| **Programming Languages** | C, C++, Java, JavaScript, Python |
+| **Web & Runtime** | React, Node.js, Express, Vite, HTML5, CSS3, Framer Motion, Flask |
+| **Databases** | MongoDB, MySQL, DBMS |
+| **Cloud & Deployment** | Vercel, Netlify, Render |
+| **Tools & Platforms** | Git, GitHub, Canva, Socket.IO, WebSockets, JWT, Leaflet Maps |
+| **CS Fundamentals** | Data Structures & Algorithms (DSA), OOPs, Operating Systems, Computer Networks, Problem Solving |
 
 ---
 

@@ -2,7 +2,37 @@ import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
 
-const skills = [
+import cBadge from '../assets/skills/c.svg'
+import cppBadge from '../assets/skills/cpp.svg'
+import jsBadge from '../assets/skills/javascript.svg'
+import javaBadge from '../assets/skills/java.svg'
+import vercelBadge from '../assets/skills/vercel.svg'
+import netlifyBadge from '../assets/skills/netlify.svg'
+import renderBadge from '../assets/skills/render.svg'
+import nodejsBadge from '../assets/skills/nodejs.svg'
+import mysqlBadge from '../assets/skills/mysql.svg'
+import mongodbBadge from '../assets/skills/mongodb.svg'
+import canvaBadge from '../assets/skills/canva.svg'
+import gitBadge from '../assets/skills/git.svg'
+import githubBadge from '../assets/skills/github.svg'
+
+const skillBadges = [
+  { name: 'C', src: cBadge },
+  { name: 'C++', src: cppBadge },
+  { name: 'JavaScript', src: jsBadge },
+  { name: 'Java', src: javaBadge },
+  { name: 'Vercel', src: vercelBadge },
+  { name: 'Netlify', src: netlifyBadge },
+  { name: 'Render', src: renderBadge },
+  { name: 'Node.js', src: nodejsBadge },
+  { name: 'MySQL', src: mysqlBadge },
+  { name: 'MongoDB', src: mongodbBadge },
+  { name: 'Canva', src: canvaBadge },
+  { name: 'Git', src: gitBadge },
+  { name: 'GitHub', src: githubBadge },
+]
+
+const csSkills = [
   'DSA', 'OOPS', 'Computer Networks',
   'Operating Systems', 'DBMS', 'Problem Solving'
 ]
@@ -21,7 +51,7 @@ const Experience = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          Experience
+          Experience & Skills
         </motion.h2>
 
         <motion.div
@@ -40,7 +70,7 @@ const Experience = () => {
               <span className="terminal-window-dot red"></span>
               <span className="terminal-window-dot yellow"></span>
               <span className="terminal-window-dot green"></span>
-              <span className="terminal-window-title">experience.sh</span>
+              <span className="terminal-window-title">skills_and_experience.sh — bash</span>
             </div>
             <div className="terminal-window-body">
               <div className="terminal-line">
@@ -52,28 +82,57 @@ const Experience = () => {
                 <span className="highlight">  "role"</span>: <span className="output">"Software Engineer"</span>,<br />
                 <span className="highlight">  "status"</span>: <span className="output">"Open to Work"</span>,<br />
                 <span className="highlight">  "education"</span>: <span className="output">"Recent Graduate"</span>,<br />
-                <span className="highlight">  "focus"</span>: <span className="output">"Backend & Full-Stack"</span>,<br />
+                <span className="highlight">  "focus"</span>: <span className="output">"Backend & Full-Stack Systems"</span>,<br />
                 <span className="comment">{'}'}</span>
               </div>
-              <div className="terminal-line" style={{ marginTop: '16px' }}>
+
+              {/* Technologies & Tools from Screenshot */}
+              <div className="terminal-line" style={{ marginTop: '20px' }}>
                 <span className="prompt">$</span>
-                <span className="command">./run-skills.sh</span>
+                <span className="command">./list-technologies.sh --visual</span>
+              </div>
+              <div className="tech-badges-container">
+                {skillBadges.map((badge, index) => (
+                  <motion.div
+                    key={badge.name}
+                    className="tech-badge-item"
+                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    animate={isInView ? { opacity: 1, scale: 1, y: 0 } : {}}
+                    transition={{ duration: 0.3, delay: 0.2 + index * 0.04 }}
+                    whileHover={{ scale: 1.08, y: -2 }}
+                  >
+                    <img
+                      src={badge.src}
+                      alt={badge.name}
+                      className="tech-badge-img"
+                      loading="lazy"
+                    />
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Core CS Fundamentals */}
+              <div className="terminal-line" style={{ marginTop: '20px' }}>
+                <span className="prompt">$</span>
+                <span className="command">./run-core-skills.sh</span>
               </div>
               <div className="skills-grid">
-                {skills.map((skill, index) => (
+                {csSkills.map((skill, index) => (
                   <motion.span
                     key={skill}
                     className="skill-tag"
                     initial={{ opacity: 0, y: 10 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.3, delay: 0.8 + index * 0.05 }}
+                    transition={{ duration: 0.3, delay: 0.7 + index * 0.05 }}
+                    whileHover={{ scale: 1.05 }}
                   >
                     {skill}
                   </motion.span>
                 ))}
               </div>
-              <div className="terminal-line output" style={{ marginTop: '16px' }}>
-                <span className="comment">// Strong foundation in core CS concepts with hands-on project experience.</span>
+
+              <div className="terminal-line output" style={{ marginTop: '20px' }}>
+                <span className="comment">// Proficient in full-stack architectures, high-performance algorithms, and modern deployment toolchains.</span>
               </div>
             </div>
           </motion.div>

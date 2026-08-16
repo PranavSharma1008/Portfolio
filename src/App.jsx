@@ -55,7 +55,6 @@ function App() {
   return (
     <>
       {isLoading && <TerminalLoader onComplete={() => setIsLoading(false)} />}
-      <div className="scanlines" />
       <Header activeSection={activeSection} />
       <main>
         <Hero key={isLoading ? 'hero-loading' : 'hero-active'} />
