@@ -1476,8 +1476,26 @@ button:focus-visible {
   border-radius: 12px;
   overflow: hidden;
   background: var(--bg-card);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.slider-card:hover .slider-card-inner,
+.slider-card.selected .slider-card-inner {
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.light .slider-card-inner {
   border: 1px solid var(--border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.light .slider-card:hover .slider-card-inner,
+.light .slider-card.selected .slider-card-inner {
+  border-color: var(--accent);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
 }
 
 .slider-card-image {
@@ -1579,7 +1597,7 @@ button:focus-visible {
   font-weight: 600;
   color: var(--text-primary);
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   padding: 6px 16px;
@@ -1587,6 +1605,14 @@ button:focus-visible {
   white-space: nowrap;
   pointer-events: none;
   z-index: 2;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.light .slider-card-label {
+  border: 1px solid var(--border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -1600,11 +1626,15 @@ button:focus-visible {
   gap: 24px;
   z-index: 2;
   padding: 14px 16px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
   background: var(--bg-card);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border-radius: 0 0 12px 12px;
+}
+
+.light .slider-card-links {
+  border-top: 1px solid var(--border);
 }
 
 .slider-card-link {

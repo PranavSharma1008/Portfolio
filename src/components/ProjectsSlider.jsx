@@ -1,11 +1,10 @@
 import { useRef, useEffect, useState } from 'react'
 import { motion, useMotionValue } from 'framer-motion'
-import flashdropIcon from '../assets/flashdrop-icon.png'
 import flashdropScreenshot from '../assets/flashdrop-screenshot.png'
-import bloodyIcon from '../assets/bloody-icon.png'
 import bloodoceanIcon from '../assets/bloodocean-icon.png'
 import portfolioScreenshot from '../assets/portfolio-screenshot.png'
 import campsfixScreenshot from '../assets/campsfix-screenshot.png'
+import daytaskScreenshot from '../assets/daytask-screenshot.png'
 
 const projects = [
   {
@@ -36,6 +35,14 @@ const projects = [
     tech: ['Spring Boot', 'Java 17', 'React', 'MongoDB', 'Tailwind CSS'],
     image: campsfixScreenshot,
     github: 'https://github.com/PranavSharma1008/CampusFix'
+  },
+  {
+    title: 'DayTask — Daily Task Tracker',
+    description: 'A modern cross-device daily task tracker featuring custom high-alert reminder thresholds, dynamic priority escalation, and instant real-time synchronization with zero external dependencies.',
+    tech: ['JavaScript', 'Node.js', 'HTML5', 'CSS3', 'REST API', 'localStorage'],
+    image: daytaskScreenshot,
+    github: 'https://github.com/PranavSharma1008/Daily_Task_Tracker',
+    live: 'https://pranavdaytask.netlify.app/'
   }
 ]
 

@@ -60,6 +60,15 @@
 
 ---
 
+### 5. 📅 DayTask — Daily Task Tracker
+> A modern cross-device daily task tracker featuring custom high-alert reminder thresholds, dynamic priority escalation, and instant real-time synchronization with zero external dependencies.
+
+- **Tech Stack**: `JavaScript` | `Node.js` | `HTML5` | `CSS3` | `REST API` | `localStorage`
+- **Live Demo**: [pranavdaytask.netlify.app](https://pranavdaytask.netlify.app/)
+- **Repository**: [github.com/PranavSharma1008/Daily_Task_Tracker](https://github.com/PranavSharma1008/Daily_Task_Tracker)
+
+---
+
 ## 💻 Tech Stack & Skills
 
 | Category | Core Skills & Technologies |
