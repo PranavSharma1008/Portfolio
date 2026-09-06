@@ -1,4 +1,4 @@
-import { useRef, useMemo } from "react"
+import React, { useRef, useMemo } from "react"
 import { motion, useInView, useScroll, useTransform } from "framer-motion"
 import { cn } from "../lib/utils"
 
@@ -44,15 +44,28 @@ export function ScrollReveal({
   )
 
   const splitText = useMemo(() => {
-    const text = typeof children === "string" ? children : ""
-    return text
-      .split(/(\s+)/)
-      .map((part, index) => ({
-        value: part,
-        isSpace: /^\s+$/.test(part) && part.length > 0,
-        originalIndex: index,
-      }))
-      .filter((item) => item.value.length > 0)
+    const extractTokens = (node, isStrong = false) => {
+      if (typeof node === "string" || typeof node === "number") {
+        return node
+          .toString()
+          .split(/(\s+)/)
+          .filter((part) => part.length > 0)
+          .map((part) => ({
+            value: part,
+            isSpace: /^\s+$/.test(part),
+            isStrong,
+          }))
+      }
+      if (Array.isArray(node)) {
+        return node.flatMap((child) => extractTokens(child, isStrong))
+      }
+      if (React.isValidElement(node)) {
+        const strong = isStrong || node.type === "strong"
+        return extractTokens(node.props?.children, strong)
+      }
+      return []
+    }
+    return extractTokens(children)
   }, [children])
 
   const containerVariants = {
@@ -98,16 +111,16 @@ export function ScrollReveal({
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
       >
-        {splitText.map((item) =>
+        {splitText.map((item, index) =>
           item.isSpace ? (
-            <span key={`space-${item.originalIndex}`}>{item.value}</span>
+            <span key={`space-${index}`}>{item.value}</span>
           ) : (
             <motion.span
-              key={`word-${item.originalIndex}`}
+              key={`word-${index}`}
               className="inline-block"
               variants={wordVariants}
             >
-              {item.value}
+              {item.isStrong ? <strong>{item.value}</strong> : item.value}
             </motion.span>
           )
         )}

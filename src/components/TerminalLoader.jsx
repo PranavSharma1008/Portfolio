@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 const USERNAME_TARGET = 'Pranavsharma'
 const PASSWORD_TARGET = '******'
@@ -9,15 +9,10 @@ const TerminalLoader = ({ onComplete }) => {
   const [password, setPassword] = useState('')
   const [step, setStep] = useState(0) // 0: init, 1: type username, 2: password prompt, 3: type password, 4: verifying, 5: granted, 6: done
   const [progress, setProgress] = useState(0)
-  const [isClosing, setIsClosing] = useState(false)
 
   const handleFinish = useCallback(() => {
-    if (isClosing) return
-    setIsClosing(true)
-    setTimeout(() => {
-      onComplete()
-    }, 450)
-  }, [isClosing, onComplete])
+    onComplete()
+  }, [onComplete])
 
   // Keyboard shortcut (ESC or Enter or Space) to skip
   useEffect(() => {
@@ -126,15 +121,14 @@ const TerminalLoader = ({ onComplete }) => {
   }
 
   return (
-    <AnimatePresence>
-      {!isClosing && (
-        <motion.div
-          className="terminal-loader-overlay"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.03 }}
-          transition={{ duration: 0.45, ease: 'easeInOut' }}
-        >
-          <div className="terminal-loader-bg-glow" />
+    <motion.div
+      className="terminal-loader-overlay"
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 1.02 }}
+      transition={{ duration: 0.4, ease: 'easeInOut' }}
+    >
+      <div className="terminal-loader-bg-glow" />
 
           <motion.div
             className="terminal-loader-window"
@@ -226,8 +220,6 @@ const TerminalLoader = ({ onComplete }) => {
             </div>
           </motion.div>
         </motion.div>
-      )}
-    </AnimatePresence>
   )
 }
 

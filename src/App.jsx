@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import Experience from './components/Experience'
@@ -54,17 +55,31 @@ function App() {
 
   return (
     <>
-      {isLoading && <TerminalLoader onComplete={() => setIsLoading(false)} />}
-      <Header activeSection={activeSection} />
-      <main>
-        <Hero key={isLoading ? 'hero-loading' : 'hero-active'} />
-        <Experience />
-        <Projects />
-        <Achievements />
-        <Contact />
-      </main>
-      <Footer />
-      <ScrollToTop />
+      <AnimatePresence>
+        {isLoading && (
+          <TerminalLoader key="terminal-loader" onComplete={() => setIsLoading(false)} />
+        )}
+      </AnimatePresence>
+
+      {!isLoading && (
+        <motion.div
+          key="portfolio-content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+        >
+          <Header activeSection={activeSection} />
+          <main>
+            <Hero />
+            <Experience />
+            <Projects />
+            <Achievements />
+            <Contact />
+          </main>
+          <Footer />
+          <ScrollToTop />
+        </motion.div>
+      )}
     </>
   )
 }

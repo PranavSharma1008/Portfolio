@@ -21,7 +21,12 @@ const Contact = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
         >
-          <div className="terminal-window" style={{ marginBottom: '32px' }}>
+          <motion.div
+            className="terminal-window"
+            style={{ marginBottom: '32px' }}
+            whileHover={{ y: -4, boxShadow: '0 0 35px rgba(0, 255, 157, 0.15)' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          >
             <div className="terminal-window-header">
               <span className="terminal-window-dot red"></span>
               <span className="terminal-window-dot yellow"></span>
@@ -37,7 +42,7 @@ const Contact = () => {
                 I'm currently looking for new opportunities to kickstart my career in software engineering. Whether you have a question or just want to say hi, feel free to reach out!
               </div>
             </div>
-          </div>
+          </motion.div>
 
           <p className="contact-description">
             Run one of these commands to get in touch:

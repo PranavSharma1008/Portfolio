@@ -31,16 +31,16 @@ const MoonIcon = () => (
 const Header = ({ activeSection }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
-  const [isDark, setIsDark] = useState(false)
+  const [isDark, setIsDark] = useState(true)
 
   useEffect(() => {
     const saved = localStorage.getItem('theme')
-    if (saved === 'dark') {
-      setIsDark(true)
-      document.documentElement.classList.remove('light')
-    } else {
+    if (saved === 'light') {
       setIsDark(false)
       document.documentElement.classList.add('light')
+    } else {
+      setIsDark(true)
+      document.documentElement.classList.remove('light')
     }
   }, [])
 

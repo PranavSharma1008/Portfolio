@@ -6,18 +6,25 @@ import animatedAvatar from '../assets/animated.png'
 const Hero = () => {
   return (
     <section className="hero" id="home">
+      {/* Background Tech Dot-Grid & Ambient Glow (Option 1) */}
+      <div className="hero-bg-elements" aria-hidden="true">
+        <div className="hero-grid-pattern" />
+        <div className="hero-glow-orb hero-glow-emerald" />
+        <div className="hero-glow-orb hero-glow-cyan" />
+      </div>
+
       <div className="container hero-container">
         <motion.div
           className="hero-content"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <TypingText as="p" className="hero-greeting" delay={0.2} duration={1.0}>
+          <TypingText as="p" className="hero-greeting" delay={0.15} duration={0.45}>
             Hello, World!
           </TypingText>
 
-          <TypingText as="h1" className="hero-name" delay={1.2} duration={1.6}>
+          <TypingText as="h1" className="hero-name" delay={0.4} duration={0.8}>
             Pranav <span className="accent">Sharma</span>
           </TypingText>
 
@@ -25,7 +32,7 @@ const Hero = () => {
             textClassName="hero-description"
             align="left"
             staggerDelay={0.02}
-            threshold={0.3}
+            threshold={0.2}
             duration={0.6}
           >
             I'm a <strong>Software Engineer</strong> specializing in building robust backend systems and scalable full-stack applications. Proficient in <strong>DSA, OOPS, Computer Networks, OS, and DBMS</strong>.
@@ -33,9 +40,9 @@ const Hero = () => {
 
           <motion.div
             className="hero-links"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.2, duration: 0.5 }}
+            transition={{ delay: 1.0, duration: 0.4, ease: 'easeOut' }}
           >
             <a href="#projects" className="cmd-btn cmd-btn-primary">
               <span className="btn-icon">$</span>
@@ -50,9 +57,9 @@ const Hero = () => {
 
         <motion.div
           className="hero-image"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
+          initial={{ opacity: 0, scale: 0.92, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5, ease: 'easeOut' }}
         >
           <div className="terminal-card">
             <div className="terminal-dots">
@@ -62,9 +69,14 @@ const Hero = () => {
             </div>
             <div className="terminal-title">profile.sh — bash</div>
             <div className="terminal-body">
-              <div className="terminal-avatar">
+              <motion.div
+                className="terminal-avatar"
+                initial={{ opacity: 0, scale: 0.88 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.65, duration: 0.4, ease: 'easeOut' }}
+              >
                 <img src={animatedAvatar} alt="Pranav Sharma" />
-              </div>
+              </motion.div>
               <div className="terminal-name">Pranav Sharma</div>
               <div className="terminal-role">Software Engineer</div>
               <div className="terminal-info">
