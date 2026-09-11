@@ -5,7 +5,7 @@ export const LEETCODE_BADGES_REPO_URL = 'https://github.com/PranavSharma1008/Lee
 
 export const leetcodeInitialData = {
   username: 'SharmaPranav1008',
-  avatar: 'https://assets.leetcode.com/users/SharmaPranav1008/avatar_1789129998.png',
+  avatar: 'https://assets.leetcode.com/users/SharmaPranav1008/avatar_1789130452.png',
   profileUrl: LEETCODE_PROFILE_URL,
   repoUrl: LEETCODE_SERIE_REPO_URL,
   badgesRepoUrl: LEETCODE_BADGES_REPO_URL,

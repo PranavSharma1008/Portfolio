@@ -6,7 +6,7 @@ import {
   LEETCODE_SERIE_REPO_URL,
   LEETCODE_BADGES_REPO_URL
 } from '../data/leetcodeData'
-import { syncLeetCodeWithLiveSources } from '../lib/githubLeetcodeSync'
+import { syncLeetCodeWithLiveSources, CACHE_KEY } from '../lib/githubLeetcodeSync'
 import LeetCodeBadgeModal from './LeetCodeBadgeModal'
 
 const leetcodeIconSvg = (
@@ -41,7 +41,7 @@ const LeetCodeSection = () => {
 
     // 1. Instantly hydrate from local cache if present
     try {
-      const cached = localStorage.getItem('pranav_portfolio_leetcode_live_sync_v3')
+      const cached = localStorage.getItem(CACHE_KEY)
       if (cached) {
         const parsed = JSON.parse(cached)
         if (parsed?.data) {

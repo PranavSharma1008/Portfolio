@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import CertificatesGallery from './CertificatesGallery'
+import { leetcodeInitialData } from '../data/leetcodeData'
+import { CACHE_KEY } from '../lib/githubLeetcodeSync'
 
 const githubIcon = (
   <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
@@ -47,7 +50,7 @@ const achievements = [
   },
   {
     title: 'DSA Mastery',
-    description: 'Solved 256+ algorithm problems covering dynamic programming, graphs, trees, and system logic with 100-Day consistency badges.',
+    description: 'Solved 256 algorithm problems covering dynamic programming, graphs, trees, and system logic with 100-Day consistency badges.',
     year: '256 Solved',
     badgeIcon: leetcodeIcon,
     isDsaCard: true,
@@ -75,6 +78,39 @@ const achievements = [
 ]
 
 const Achievements = () => {
+  const [solvedCount, setSolvedCount] = useState(leetcodeInitialData.totalSolved)
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached)
+        if (parsed?.data?.totalSolved) {
+          setSolvedCount(parsed.data.totalSolved)
+        }
+      }
+    } catch (e) {}
+
+    const handleSync = (e) => {
+      if (e.detail?.totalSolved) {
+        setSolvedCount(e.detail.totalSolved)
+      }
+    }
+    window.addEventListener('leetcode-synced', handleSync)
+    return () => window.removeEventListener('leetcode-synced', handleSync)
+  }, [])
+
+  const displayAchievements = achievements.map((achievement) => {
+    if (achievement.isDsaCard) {
+      return {
+        ...achievement,
+        description: `Solved ${solvedCount} algorithm problems covering dynamic programming, graphs, trees, and system logic with 100-Day consistency badges.`,
+        year: `${solvedCount} Solved`
+      }
+    }
+    return achievement
+  })
+
   const scrollToLeetcode = (e) => {
     e.preventDefault()
     const el = document.getElementById('leetcode')
@@ -113,7 +149,7 @@ const Achievements = () => {
         </motion.h2>
 
         <div className="achievements-grid">
-          {achievements.map((achievement, index) => (
+          {displayAchievements.map((achievement, index) => (
             <motion.article
               key={index}
               className={`achievement-card ${achievement.isCertCard ? 'achievement-card-certs' : ''}`}
