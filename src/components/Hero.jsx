@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { TypingText } from './TypingText'
 import ScrollReveal from './ScrollReveal'
+import ResumeModal from './ResumeModal'
 import animatedAvatar from '../assets/animated.png'
 
 const Hero = () => {
+  const [isResumeOpen, setIsResumeOpen] = useState(false)
+
   return (
     <section className="hero" id="home">
       {/* Background Tech Dot-Grid & Ambient Glow (Option 1) */}
@@ -51,6 +55,20 @@ const Hero = () => {
             <a href="#contact" className="cmd-btn">
               <span className="btn-icon">#</span>
               ./contact-me.sh
+            </a>
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cmd-btn"
+              onClick={(e) => {
+                e.preventDefault()
+                setIsResumeOpen(true)
+              }}
+              title="View or download resume"
+            >
+              <span className="btn-icon">~</span>
+              ./view-resume.sh
             </a>
           </motion.div>
         </motion.div>
@@ -101,6 +119,11 @@ const Hero = () => {
           </div>
         </motion.div>
       </div>
+
+      <ResumeModal
+        isOpen={isResumeOpen}
+        onClose={() => setIsResumeOpen(false)}
+      />
     </section>
   )
 }
