@@ -5,6 +5,8 @@ import Hero from './components/Hero'
 import Experience from './components/Experience'
 import Projects from './components/Projects'
 import Achievements from './components/Achievements'
+import LeetCodeSection from './components/LeetCodeSection'
+import TypingSection from './components/TypingSection'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
@@ -16,7 +18,7 @@ function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['home', 'experience', 'projects', 'achievements', 'contact']
+      const sections = ['home', 'experience', 'projects', 'achievements', 'leetcode', 'typing', 'contact']
       const scrollPosition = window.scrollY + 100
 
       for (const sectionId of sections) {
@@ -74,6 +76,8 @@ function App() {
             <Experience />
             <Projects />
             <Achievements />
+            <LeetCodeSection />
+            <TypingSection />
             <Contact />
           </main>
           <Footer />

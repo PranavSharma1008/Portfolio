@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import CertificatesGallery from './CertificatesGallery'
 
 const githubIcon = (
   <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
@@ -18,13 +19,27 @@ const monkeyTypeIcon = (
   </svg>
 )
 
+const certBadgeIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="24" height="24">
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  </svg>
+)
+
+const checkBadgeIcon = (
+  <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+  </svg>
+)
+
 const iconMap = { github: githubIcon, leetcode: leetcodeIcon, monkeytype: monkeyTypeIcon }
 
 const achievements = [
   {
     title: 'Professional Typer',
-    description: 'Achieved 90% accuracy with 50 WPM. Certified in touch typing for enhanced productivity.',
-    year: '2024',
+    description: 'Achieved 82 WPM peak sprint and 100% accuracy. Documented milestones on Monkeytype.',
+    year: '14 Records',
+    badgeIcon: checkBadgeIcon,
+    isTypingCard: true,
     links: [
       { url: 'https://github.com/PranavSharma1008/TypingAchivenments', type: 'github' },
       { url: 'https://monkeytype.com/profile/SharmaPranav1008', type: 'monkeytype' }
@@ -32,17 +47,21 @@ const achievements = [
   },
   {
     title: 'DSA Mastery',
-    description: 'Completed comprehensive DSA course covering arrays, linked lists, trees, graphs, DP, and algorithm design.',
-    year: '2024',
+    description: 'Solved 256+ algorithm problems covering dynamic programming, graphs, trees, and system logic with 100-Day consistency badges.',
+    year: '256 Solved',
+    badgeIcon: leetcodeIcon,
+    isDsaCard: true,
     links: [
-      { url: 'https://github.com/PranavSharma1008/LeetcodeSerieGithub', type: 'github' },
-      { url: 'https://leetcode.com/u/SharmaPranav1008/', type: 'leetcode' }
+      { url: 'https://leetcode.com/u/SharmaPranav1008/', type: 'leetcode' },
+      { url: 'https://github.com/PranavSharma1008/LeetcodeSerieGithub', type: 'github' }
     ]
   },
   {
-    title: 'Certifications',
-    description: 'All course completion certificates including DSA, DBMS, Networking, and other certifications.',
-    year: '2024',
+    title: 'Certifications & Credentials',
+    description: '42 verified certificates across Generative AI, Python & Machine Learning, Intellectual Property Law, Design Thinking, and Cybersecurity.',
+    year: '42 Verified',
+    badgeIcon: certBadgeIcon,
+    isCertCard: true,
     links: [
       { url: 'https://github.com/PranavSharma1008/Certificates', type: 'github' }
     ]
@@ -50,11 +69,36 @@ const achievements = [
   {
     title: 'Computer Networks',
     description: 'Certified in networking concepts including OSI model, TCP/IP, routing protocols, and network security.',
-    year: '2023'
+    year: '2023',
+    badgeIcon: checkBadgeIcon
   }
 ]
 
 const Achievements = () => {
+  const scrollToLeetcode = (e) => {
+    e.preventDefault()
+    const el = document.getElementById('leetcode')
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  const scrollToCerts = (e) => {
+    e.preventDefault()
+    const el = document.getElementById('certificates-section')
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  const scrollToTyping = (e) => {
+    e.preventDefault()
+    const el = document.getElementById('typing')
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <section className="achievements section-padding" id="achievements">
       <div className="container">
@@ -72,21 +116,53 @@ const Achievements = () => {
           {achievements.map((achievement, index) => (
             <motion.article
               key={index}
-              className="achievement-card"
+              className={`achievement-card ${achievement.isCertCard ? 'achievement-card-certs' : ''}`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -4, boxShadow: '0 0 30px rgba(0, 212, 255, 0.1)' }}
+              whileHover={{ y: -4, boxShadow: '0 0 30px rgba(0, 212, 255, 0.12)' }}
             >
               <div className="achievement-badge">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
+                {achievement.badgeIcon || checkBadgeIcon}
               </div>
               <h3 className="achievement-title">{achievement.title}</h3>
               <p className="achievement-description">{achievement.description}</p>
-              <span className="achievement-date">{achievement.year}</span>
+              
+              <div className="achievement-meta-row">
+                <span className="achievement-date">{achievement.year}</span>
+                {achievement.isCertCard && (
+                  <button
+                    type="button"
+                    onClick={scrollToCerts}
+                    className="ach-jump-certs-btn"
+                    title="Jump to certificates gallery"
+                  >
+                    Explore 42 Certificates ↓
+                  </button>
+                )}
+                {achievement.isTypingCard && (
+                  <button
+                    type="button"
+                    onClick={scrollToTyping}
+                    className="ach-jump-certs-btn"
+                    title="Jump to typing records section"
+                  >
+                    Explore Typing Records ↓
+                  </button>
+                )}
+                {achievement.isDsaCard && (
+                  <button
+                    type="button"
+                    onClick={scrollToLeetcode}
+                    className="ach-jump-certs-btn"
+                    title="Jump to LeetCode section"
+                  >
+                    Explore LeetCode Stats ↓
+                  </button>
+                )}
+              </div>
+
               {achievement.links && (
                 <div className="achievement-links">
                   {achievement.links.map((link, i) => (
@@ -99,6 +175,9 @@ const Achievements = () => {
             </motion.article>
           ))}
         </div>
+
+        {/* Full 42 Certificates Interactive Showcase */}
+        <CertificatesGallery />
       </div>
     </section>
   )

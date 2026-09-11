@@ -94,17 +94,24 @@ const Header = ({ activeSection }) => {
         </button>
 
         <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
-          {navLinks.map((link) => (
-            <li key={link.id}>
-              <button
-                onClick={() => scrollToSection(link.id)}
-                className={`nav-link ${activeSection === link.id ? 'active' : ''}`}
-              >
-                <span className="nav-prefix">{activeSection === link.id ? '>' : ' '}</span>
-                {link.label}
-              </button>
-            </li>
-          ))}
+          {navLinks.map((link) => {
+            const isLinkActive =
+              activeSection === link.id ||
+              (link.id === 'achievements' &&
+                (activeSection === 'leetcode' || activeSection === 'typing'))
+
+            return (
+              <li key={link.id}>
+                <button
+                  onClick={() => scrollToSection(link.id)}
+                  className={`nav-link ${isLinkActive ? 'active' : ''}`}
+                >
+                  <span className="nav-prefix">{isLinkActive ? '>' : ' '}</span>
+                  {link.label}
+                </button>
+              </li>
+            )
+          })}
           <li className="mobile-only">
             <button className="theme-toggle-mobile" onClick={toggleTheme} aria-label="Toggle theme">
               {isDark ? <SunIcon /> : <MoonIcon />}
