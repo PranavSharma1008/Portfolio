@@ -9,12 +9,12 @@ export const leetcodeInitialData = {
   profileUrl: LEETCODE_PROFILE_URL,
   repoUrl: LEETCODE_SERIE_REPO_URL,
   badgesRepoUrl: LEETCODE_BADGES_REPO_URL,
-  ranking: '628,737',
-  totalSolved: 256,
+  ranking: '625,872',
+  totalSolved: 257,
   easySolved: 173,
-  mediumSolved: 79,
+  mediumSolved: 80,
   hardSolved: 4,
-  acceptanceRate: '68.4%',
+  acceptanceRate: '70.42%',
   badges: [
     {
       id: '100-days-2026',

@@ -72,7 +72,7 @@ const LeetCodeSection = () => {
   const handleManualSync = async () => {
     if (isSyncing) return
     setIsSyncing(true)
-    setSyncStatus({ message: 'Fetching live stats from LeetCode & GitHub...', type: 'info' })
+    setSyncStatus({ message: 'Fetching all live data from LeetCode & GitHub...', type: 'info' })
     try {
       const res = await syncLeetCodeWithLiveSources(true)
       if (res && res.data) {
@@ -84,7 +84,7 @@ const LeetCodeSection = () => {
       }
     } catch (err) {
       setSyncStatus({
-        message: 'Could not connect to LeetCode API. Loaded cached verified data.',
+        message: 'Could not connect to live API. Loaded all verified cached data.',
         type: 'info'
       })
     } finally {
@@ -137,9 +137,9 @@ const LeetCodeSection = () => {
     selectedBadgeIndex !== null ? filteredBadges[selectedBadgeIndex] : null
 
   // Percentages of solved problems
-  const total = data.totalSolved || 255
+  const total = data.totalSolved || 257
   const easyPct = Math.round(((data.easySolved || 173) / total) * 100)
-  const medPct = Math.round(((data.mediumSolved || 78) / total) * 100)
+  const medPct = Math.round(((data.mediumSolved || 80) / total) * 100)
   const hardPct = Math.round(((data.hardSolved || 4) / total) * 100)
 
   return (
@@ -295,7 +295,7 @@ const LeetCodeSection = () => {
             <div className="stat-icon">🎯</div>
             <div className="stat-content">
               <span className="stat-number">{data.acceptanceRate}</span>
-              <span className="stat-label">Submission Accuracy Rate</span>
+              <span className="stat-label">Acceptance Rate</span>
             </div>
           </motion.div>
 

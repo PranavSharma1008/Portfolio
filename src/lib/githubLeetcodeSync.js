@@ -21,7 +21,7 @@ import {
   LEETCODE_BADGES_REPO_URL
 } from '../data/leetcodeData'
 
-export const CACHE_KEY = 'pranav_portfolio_leetcode_live_sync_v4'
+export const CACHE_KEY = 'pranav_portfolio_leetcode_live_sync_v6'
 export const CACHE_TTL_MS = 1000 * 60 * 5 // 5 minutes cache
 
 // Flush stale legacy cache keys from localStorage
@@ -30,7 +30,9 @@ if (typeof window !== 'undefined') {
     [
       'pranav_portfolio_leetcode_live_sync_v1',
       'pranav_portfolio_leetcode_live_sync_v2',
-      'pranav_portfolio_leetcode_live_sync_v3'
+      'pranav_portfolio_leetcode_live_sync_v3',
+      'pranav_portfolio_leetcode_live_sync_v4',
+      'pranav_portfolio_leetcode_live_sync_v5'
     ].forEach((k) => localStorage.removeItem(k))
   } catch (e) {}
 }
@@ -51,6 +53,11 @@ const LEETCODE_GRAPHQL_QUERY = `
           count
           submissions
         }
+        totalSubmissionNum {
+          difficulty
+          count
+          submissions
+        }
       }
       badges {
         id
@@ -59,6 +66,20 @@ const LEETCODE_GRAPHQL_QUERY = `
         icon
         hoverText
         creationDate
+      }
+      tagProblemCounts {
+        advanced {
+          tagName
+          problemsSolved
+        }
+        intermediate {
+          tagName
+          problemsSolved
+        }
+        fundamental {
+          tagName
+          problemsSolved
+        }
       }
     }
   }
@@ -170,7 +191,9 @@ export const fetchLeetCodeLiveGraphQL = async (username = LEETCODE_USERNAME, for
 
 const parseGraphQLData = (user) => {
   const acList = user.submitStats?.acSubmissionNum || []
+  const totalList = user.submitStats?.totalSubmissionNum || []
   const allAc = acList.find((s) => s.difficulty === 'All')
+  const allTotal = totalList.find((s) => s.difficulty === 'All')
   const easyAc = acList.find((s) => s.difficulty === 'Easy')
   const medAc = acList.find((s) => s.difficulty === 'Medium')
   const hardAc = acList.find((s) => s.difficulty === 'Hard')
@@ -184,10 +207,10 @@ const parseGraphQLData = (user) => {
   const rawRanking = user.profile?.ranking
   const ranking = rawRanking ? Number(rawRanking).toLocaleString() : leetcodeInitialData.ranking
 
-  // Acceptance rate
+  // Acceptance rate: (Accepted Submissions / Total Submissions) * 100
   let acceptanceRate = leetcodeInitialData.acceptanceRate
-  if (allAc && allAc.submissions > 0) {
-    acceptanceRate = `${((allAc.count / allAc.submissions) * 100).toFixed(1)}%`
+  if (allAc && allTotal && allTotal.submissions > 0) {
+    acceptanceRate = `${((allAc.submissions / allTotal.submissions) * 100).toFixed(2)}%`
   }
 
   // Badges
@@ -209,6 +232,31 @@ const parseGraphQLData = (user) => {
     }))
   }
 
+  // Live Skill/Topic stats from tagProblemCounts
+  let liveTopics = null
+  if (user.tagProblemCounts) {
+    const allTags = [
+      ...(user.tagProblemCounts.fundamental || []),
+      ...(user.tagProblemCounts.intermediate || []),
+      ...(user.tagProblemCounts.advanced || [])
+    ]
+    const map = new Map()
+    for (const tag of allTags) {
+      if (tag.tagName && typeof tag.problemsSolved === 'number') {
+        map.set(tag.tagName, Math.max(map.get(tag.tagName) || 0, tag.problemsSolved))
+      }
+    }
+    const sorted = Array.from(map.entries())
+      .filter(([_, count]) => count > 0)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([name, count]) => ({ name, count }))
+
+    if (sorted.length > 0) {
+      liveTopics = sorted
+    }
+  }
+
   return {
     avatar,
     totalSolved,
@@ -217,7 +265,8 @@ const parseGraphQLData = (user) => {
     hardSolved,
     ranking,
     acceptanceRate,
-    ...(liveBadges ? { liveBadges } : {})
+    ...(liveBadges ? { liveBadges } : {}),
+    ...(liveTopics ? { topics: liveTopics } : {})
   }
 }
 
@@ -229,9 +278,14 @@ const parseFaisalData = (json) => {
   const ranking = json.ranking ? Number(json.ranking).toLocaleString() : leetcodeInitialData.ranking
 
   let acceptanceRate = leetcodeInitialData.acceptanceRate
-  const allSub = json.totalSubmissions?.find((s) => s.difficulty === 'All')
-  if (allSub && allSub.submissions > 0) {
-    acceptanceRate = `${((json.totalSolved / allSub.submissions) * 100).toFixed(1)}%`
+  const acSubmissions =
+    json.matchedUserStats?.acSubmissionNum?.find((s) => s.difficulty === 'All')?.submissions
+  const totalSubmissions =
+    json.matchedUserStats?.totalSubmissionNum?.find((s) => s.difficulty === 'All')?.submissions ||
+    json.totalSubmissions?.find((s) => s.difficulty === 'All')?.submissions
+
+  if (acSubmissions && totalSubmissions && totalSubmissions > 0) {
+    acceptanceRate = `${((acSubmissions / totalSubmissions) * 100).toFixed(2)}%`
   }
 
   return {
@@ -252,6 +306,17 @@ const parseAlfaData = (json) => {
   const hardSolved = json.hardSolved || leetcodeInitialData.hardSolved
   const ranking = json.ranking ? Number(json.ranking).toLocaleString() : leetcodeInitialData.ranking
 
+  let acceptanceRate = leetcodeInitialData.acceptanceRate
+  const acSubmissions =
+    json.matchedUserStats?.acSubmissionNum?.find((s) => s.difficulty === 'All')?.submissions
+  const totalSubmissions =
+    json.matchedUserStats?.totalSubmissionNum?.find((s) => s.difficulty === 'All')?.submissions ||
+    json.totalSubmissions?.find((s) => s.difficulty === 'All')?.submissions
+
+  if (acSubmissions && totalSubmissions && totalSubmissions > 0) {
+    acceptanceRate = `${((acSubmissions / totalSubmissions) * 100).toFixed(2)}%`
+  }
+
   return {
     avatar: json.avatar || leetcodeInitialData.avatar,
     totalSolved,
@@ -259,7 +324,7 @@ const parseAlfaData = (json) => {
     mediumSolved,
     hardSolved,
     ranking,
-    acceptanceRate: leetcodeInitialData.acceptanceRate
+    acceptanceRate
   }
 }
 
@@ -275,9 +340,9 @@ export const fetchGitHubRepoMeta = async (owner = 'PranavSharma1008', repo = 'Le
       signal: controller.signal,
       headers: { Accept: 'application/vnd.github.v3+json' }
     })
-    clearTimeout(timeoutId)
 
     if (res.ok) {
+      clearTimeout(timeoutId)
       const data = await res.json()
       return {
         pushedAt: data.pushed_at
@@ -286,7 +351,29 @@ export const fetchGitHubRepoMeta = async (owner = 'PranavSharma1008', repo = 'Le
               day: 'numeric',
               year: 'numeric'
             })
-          : null
+          : null,
+        isLive: true
+      }
+    }
+
+    // Fallback: check public user profile update timestamp
+    const userRes = await fetch(`https://api.github.com/users/${owner}`, {
+      signal: controller.signal,
+      headers: { Accept: 'application/vnd.github.v3+json' }
+    })
+    clearTimeout(timeoutId)
+
+    if (userRes.ok) {
+      const userData = await userRes.json()
+      return {
+        pushedAt: userData.updated_at
+          ? new Date(userData.updated_at).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric'
+            })
+          : null,
+        isLive: true
       }
     }
   } catch (e) {}
@@ -322,6 +409,7 @@ export const syncLeetCodeWithLiveSources = async (forceRefresh = false) => {
     ...leetcodeInitialData,
     ...(liveStats || {}),
     badges: mergedBadges,
+    topics: liveStats?.topics || leetcodeInitialData.topics,
     repoLastUpdated: repoMeta?.pushedAt || 'Active Solutions Sync'
   }
 
@@ -352,7 +440,7 @@ export const syncLeetCodeWithLiveSources = async (forceRefresh = false) => {
     isLive: Boolean(liveStats),
     lastSyncTime: syncTimeStr,
     message: liveStats
-      ? `Live sync successful: Solved ${mergedData.totalSolved} problems & updated profile photo!`
-      : `Loaded verified archive stats (${mergedData.totalSolved} problems).`
+      ? 'Live sync successful: All LeetCode and GitHub data fetched successfully!'
+      : 'All verified LeetCode and GitHub data loaded successfully.'
   }
 }

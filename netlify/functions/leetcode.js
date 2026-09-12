@@ -14,6 +14,11 @@ const LEETCODE_GRAPHQL_QUERY = `
           count
           submissions
         }
+        totalSubmissionNum {
+          difficulty
+          count
+          submissions
+        }
       }
       badges {
         id
@@ -22,6 +27,20 @@ const LEETCODE_GRAPHQL_QUERY = `
         icon
         hoverText
         creationDate
+      }
+      tagProblemCounts {
+        advanced {
+          tagName
+          problemsSolved
+        }
+        intermediate {
+          tagName
+          problemsSolved
+        }
+        fundamental {
+          tagName
+          problemsSolved
+        }
       }
     }
   }
