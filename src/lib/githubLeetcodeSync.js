@@ -21,7 +21,7 @@ import {
   LEETCODE_BADGES_REPO_URL
 } from '../data/leetcodeData'
 
-export const CACHE_KEY = 'pranav_portfolio_leetcode_live_sync_v6'
+export const CACHE_KEY = 'pranav_portfolio_leetcode_live_sync_v7'
 export const CACHE_TTL_MS = 1000 * 60 * 5 // 5 minutes cache
 
 // Flush stale legacy cache keys from localStorage
@@ -32,7 +32,8 @@ if (typeof window !== 'undefined') {
       'pranav_portfolio_leetcode_live_sync_v2',
       'pranav_portfolio_leetcode_live_sync_v3',
       'pranav_portfolio_leetcode_live_sync_v4',
-      'pranav_portfolio_leetcode_live_sync_v5'
+      'pranav_portfolio_leetcode_live_sync_v5',
+      'pranav_portfolio_leetcode_live_sync_v6'
     ].forEach((k) => localStorage.removeItem(k))
   } catch (e) {}
 }
@@ -380,6 +381,92 @@ export const fetchGitHubRepoMeta = async (owner = 'PranavSharma1008', repo = 'Le
   return null
 }
 
+export const GITHUB_BADGES_OWNER = 'PranavSharma1008'
+export const GITHUB_BADGES_REPO = 'LeetcodeBadges'
+export const GITHUB_BADGES_BRANCH = 'main'
+
+/**
+ * Fetch dynamic milestones directly from GitHub repository LeetcodeBadges
+ * Automatically discovers any new milestone images uploaded to ProgressCalculator/
+ */
+export const fetchGitHubMilestones = async () => {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+    const apiUrl = `https://api.github.com/repos/${GITHUB_BADGES_OWNER}/${GITHUB_BADGES_REPO}/git/trees/${GITHUB_BADGES_BRANCH}?recursive=1`
+    const res = await fetch(apiUrl, {
+      signal: controller.signal,
+      headers: { Accept: 'application/vnd.github.v3+json' }
+    })
+    clearTimeout(timeoutId)
+
+    if (!res.ok) {
+      return null
+    }
+
+    const json = await res.json()
+    const tree = json.tree || []
+    const validExts = ['.png', '.jpg', '.jpeg', '.webp']
+
+    const milestones = []
+    for (const item of tree) {
+      if (item.type !== 'blob') continue
+      const lowerPath = item.path.toLowerCase()
+      const ext = validExts.find((e) => lowerPath.endsWith(e))
+      if (!ext) continue
+
+      // Look inside ProgressCalculator or any milestone image
+      if (lowerPath.includes('progresscalculator') || lowerPath.includes('milestone')) {
+        const fileName = item.path.split('/').pop()
+        const rawUrl = `https://raw.githubusercontent.com/${GITHUB_BADGES_OWNER}/${GITHUB_BADGES_REPO}/${GITHUB_BADGES_BRANCH}/${encodeURI(item.path)}`
+
+        // Extract milestone numbers (e.g. 250+, 200, 150)
+        const match = fileName.match(/(\d+\+?)/)
+        const countStr = match ? match[1] : ''
+
+        // Format dates smartly
+        let dateStr = 'Documented Record'
+        const dateMatch = fileName.match(/(\d{1,2})([A-Za-z]{3})/i)
+        if (dateMatch) {
+          dateStr = `${dateMatch[2].charAt(0).toUpperCase() + dateMatch[2].slice(1).toLowerCase()} ${dateMatch[1]}, 2026`
+        } else if (countStr.startsWith('250')) {
+          dateStr = 'Sep 2026'
+        } else if (countStr.startsWith('200')) {
+          dateStr = 'Aug 11, 2026'
+        } else if (countStr.startsWith('150')) {
+          dateStr = 'Jul 2026'
+        }
+
+        const displayName = countStr
+          ? `${countStr} Problems Solved`
+          : fileName.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ')
+
+        milestones.push({
+          id: `gh-milestone-${item.sha.slice(0, 8)}`,
+          fileName,
+          name: `${countStr ? countStr + ' Problems' : 'Progress'} Milestone`,
+          displayName,
+          type: 'milestone',
+          category: 'Progress Milestone',
+          icon: rawUrl,
+          fallbackIcon: `/leetcode/${item.path}`,
+          date: dateStr,
+          description: countStr
+            ? `Documented milestone achieving ${countStr} total solved problems on LeetCode with progress analytics.`
+            : `Verified LeetCode milestone record: ${fileName}.`,
+          countNum: parseInt(countStr) || 0,
+          isLiveGithub: true
+        })
+      }
+    }
+
+    return milestones
+  } catch (e) {
+    return null
+  }
+}
+
 /**
  * Synchronize LeetCode Data
  * Always fetches from network on visit while leveraging cached data for instant initial paint.
@@ -398,12 +485,67 @@ export const syncLeetCodeWithLiveSources = async (forceRefresh = false) => {
     repoMeta = await fetchGitHubRepoMeta('PranavSharma1008', 'LeetcodeSerieGithub')
   } catch (err) {}
 
-  // Keep milestone badges (custom screenshots) and merge any live official badges
-  let mergedBadges = leetcodeInitialData.badges
-  if (liveStats?.liveBadges && liveStats.liveBadges.length > 0) {
-    const milestones = leetcodeInitialData.badges.filter((b) => b.type === 'milestone')
-    mergedBadges = [...liveStats.liveBadges, ...milestones]
+  // Dynamic GitHub Milestones auto-sync
+  let githubMilestones = null
+  try {
+    githubMilestones = await fetchGitHubMilestones()
+  } catch (err) {}
+
+  // Merge milestones: combine live GitHub milestones with static milestones
+  let finalMilestones = leetcodeInitialData.badges.filter((b) => b.type === 'milestone')
+  if (githubMilestones && githubMilestones.length > 0) {
+    const staticMap = new Map()
+    finalMilestones.forEach((m) => {
+      const match = m.displayName.match(/(\d+\+?)/)
+      const key = match ? match[1] : m.displayName
+      staticMap.set(key, m)
+    })
+
+    const mergedMilestoneList = []
+    const seenKeys = new Set()
+
+    githubMilestones.forEach((ghm) => {
+      const match = ghm.displayName.match(/(\d+\+?)/)
+      const key = match ? match[1] : ghm.fileName
+      seenKeys.add(key)
+
+      if (staticMap.has(key)) {
+        const local = staticMap.get(key)
+        mergedMilestoneList.push({
+          ...local,
+          icon: ghm.icon || local.icon,
+          fallbackIcon: local.fallbackIcon || local.icon,
+          ghUrl: ghm.icon
+        })
+      } else {
+        mergedMilestoneList.push(ghm)
+      }
+    })
+
+    finalMilestones.forEach((m) => {
+      const match = m.displayName.match(/(\d+\+?)/)
+      const key = match ? match[1] : m.displayName
+      if (!seenKeys.has(key)) {
+        mergedMilestoneList.push(m)
+      }
+    })
+
+    // Sort descending: e.g. 250+ > 200 > 150
+    mergedMilestoneList.sort((a, b) => {
+      const numA = parseInt(a.displayName.match(/\d+/)?.[0] || '0', 10)
+      const numB = parseInt(b.displayName.match(/\d+/)?.[0] || '0', 10)
+      return numB - numA
+    })
+
+    finalMilestones = mergedMilestoneList
   }
+
+  // Keep milestone badges (custom screenshots) and merge any live official badges
+  const officialBadges = liveStats?.liveBadges && liveStats.liveBadges.length > 0
+    ? liveStats.liveBadges
+    : leetcodeInitialData.badges.filter((b) => b.type === 'badge')
+
+  const mergedBadges = [...officialBadges, ...finalMilestones]
 
   const mergedData = {
     ...leetcodeInitialData,

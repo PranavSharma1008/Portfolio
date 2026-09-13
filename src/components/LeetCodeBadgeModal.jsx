@@ -101,6 +101,11 @@ const LeetCodeBadgeModal = ({
                   src={badge.icon}
                   alt={badge.name}
                   className="leetcode-modal-badge-img"
+                  onError={(e) => {
+                    if (badge.fallbackIcon && e.currentTarget.src !== badge.fallbackIcon) {
+                      e.currentTarget.src = badge.fallbackIcon
+                    }
+                  }}
                 />
               </div>
 

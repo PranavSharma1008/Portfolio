@@ -463,6 +463,11 @@ const LeetCodeSection = () => {
                       alt={badge.name}
                       className="leetcode-badge-img"
                       loading="lazy"
+                      onError={(e) => {
+                        if (badge.fallbackIcon && e.currentTarget.src !== badge.fallbackIcon) {
+                          e.currentTarget.src = badge.fallbackIcon
+                        }
+                      }}
                     />
                   </div>
 

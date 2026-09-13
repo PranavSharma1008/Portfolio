@@ -10,9 +10,9 @@ export const leetcodeInitialData = {
   repoUrl: LEETCODE_SERIE_REPO_URL,
   badgesRepoUrl: LEETCODE_BADGES_REPO_URL,
   ranking: '625,872',
-  totalSolved: 257,
+  totalSolved: 258,
   easySolved: 173,
-  mediumSolved: 80,
+  mediumSolved: 81,
   hardSolved: 4,
   acceptanceRate: '70.42%',
   badges: [
@@ -37,12 +37,24 @@ export const leetcodeInitialData = {
       description: 'Official LeetCode recognition awarded for solving challenges consistently across 50 days.'
     },
     {
+      id: '250-solved-milestone',
+      name: '250+ Problems Milestone',
+      displayName: '250+ Problems Solved',
+      type: 'milestone',
+      category: 'Progress Milestone',
+      icon: '/leetcode/ProgressCalculator/250+.png',
+      fallbackIcon: '/leetcode/ProgressCalculator/250+.png',
+      date: 'Sep 2026',
+      description: 'Documented milestone achieving 250+ total solved problems on LeetCode with verified progress analytics.'
+    },
+    {
       id: '200-solved-milestone',
       name: '200 Problems Milestone',
       displayName: '200 Problems Solved (11 Aug)',
       type: 'milestone',
       category: 'Progress Milestone',
       icon: '/leetcode/ProgressCalculator/11Aug_200.png',
+      fallbackIcon: '/leetcode/ProgressCalculator/11Aug_200.png',
       date: 'Aug 11, 2026',
       description: 'Documented milestone achieving 200 total solved problems on LeetCode with progress analytics.'
     },
@@ -53,6 +65,7 @@ export const leetcodeInitialData = {
       type: 'milestone',
       category: 'Progress Milestone',
       icon: '/leetcode/ProgressCalculator/150.png',
+      fallbackIcon: '/leetcode/ProgressCalculator/150.png',
       date: 'Jul 2026',
       description: 'Documented milestone crossing 150 algorithmic problem solutions on LeetCode.'
     }
