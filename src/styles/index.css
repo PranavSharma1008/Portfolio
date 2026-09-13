@@ -4100,10 +4100,180 @@ button:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (max-width: 580px) {
-  .leetcode-badges-grid {
+/* Density 1-2 items (Large default) */
+.leetcode-badges-grid.density-large {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.leetcode-badges-grid.density-large .leetcode-badge-visual {
+  width: 84px;
+  height: 84px;
+}
+.leetcode-badges-grid.density-large .milestone-card .leetcode-badge-visual {
+  width: 100%;
+  max-width: 130px;
+  height: 72px;
+}
+
+/* Density 3 items (Trio) - 3 across, scaled down */
+.leetcode-badges-grid.density-trio {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.leetcode-badges-grid.density-trio .leetcode-badge-card {
+  padding: 12px 8px;
+}
+.leetcode-badges-grid.density-trio .leetcode-badge-visual {
+  width: 66px;
+  height: 66px;
+  margin-bottom: 6px;
+}
+.leetcode-badges-grid.density-trio .milestone-card .leetcode-badge-visual {
+  width: 100%;
+  max-width: 108px;
+  height: 58px;
+}
+.leetcode-badges-grid.density-trio .badge-name {
+  font-size: 0.82rem;
+}
+.leetcode-badges-grid.density-trio .badge-desc {
+  font-size: 0.70rem;
+  -webkit-line-clamp: 2;
+  margin-bottom: 6px;
+}
+.leetcode-badges-grid.density-trio .badge-category-tag {
+  font-size: 0.60rem;
+  padding: 1px 6px;
+}
+.leetcode-badges-grid.density-trio .badge-footer-row {
+  font-size: 0.68rem;
+  padding-top: 6px;
+}
+
+/* Density 4 items (Medium) - 2x2 grid */
+.leetcode-badges-grid.density-medium {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.leetcode-badges-grid.density-medium .leetcode-badge-card {
+  padding: 12px 10px;
+}
+.leetcode-badges-grid.density-medium .leetcode-badge-visual {
+  width: 68px;
+  height: 68px;
+  margin-bottom: 6px;
+}
+.leetcode-badges-grid.density-medium .milestone-card .leetcode-badge-visual {
+  width: 100%;
+  max-width: 110px;
+  height: 60px;
+}
+.leetcode-badges-grid.density-medium .badge-name {
+  font-size: 0.84rem;
+}
+.leetcode-badges-grid.density-medium .badge-desc {
+  font-size: 0.72rem;
+  -webkit-line-clamp: 2;
+  margin-bottom: 6px;
+}
+.leetcode-badges-grid.density-medium .badge-category-tag {
+  font-size: 0.62rem;
+  padding: 2px 6px;
+}
+
+/* Density 5-6 items (Compact) - 3 columns, small cards */
+.leetcode-badges-grid.density-compact {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.leetcode-badges-grid.density-compact .leetcode-badge-card {
+  padding: 10px 8px;
+  border-radius: 10px;
+}
+.leetcode-badges-grid.density-compact .leetcode-badge-visual {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 6px;
+}
+.leetcode-badges-grid.density-compact .milestone-card .leetcode-badge-visual {
+  width: 100%;
+  max-width: 88px;
+  height: 48px;
+}
+.leetcode-badges-grid.density-compact .badge-name {
+  font-size: 0.78rem;
+  margin-bottom: 2px;
+}
+.leetcode-badges-grid.density-compact .badge-desc {
+  font-size: 0.68rem;
+  -webkit-line-clamp: 1;
+  margin-bottom: 6px;
+}
+.leetcode-badges-grid.density-compact .badge-category-tag {
+  font-size: 0.58rem;
+  padding: 1px 5px;
+  margin-bottom: 4px;
+}
+.leetcode-badges-grid.density-compact .badge-footer-row {
+  font-size: 0.66rem;
+  padding-top: 5px;
+}
+
+/* Density 7+ items (Mini / Dense gallery) */
+.leetcode-badges-grid.density-mini {
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+.leetcode-badges-grid.density-mini .leetcode-badge-card {
+  padding: 8px 6px;
+  border-radius: 8px;
+}
+.leetcode-badges-grid.density-mini .leetcode-badge-visual {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 4px;
+}
+.leetcode-badges-grid.density-mini .milestone-card .leetcode-badge-visual {
+  width: 100%;
+  max-width: 76px;
+  height: 42px;
+}
+.leetcode-badges-grid.density-mini .badge-name {
+  font-size: 0.74rem;
+  margin-bottom: 2px;
+}
+.leetcode-badges-grid.density-mini .badge-desc {
+  font-size: 0.64rem;
+  -webkit-line-clamp: 1;
+  margin-bottom: 4px;
+}
+.leetcode-badges-grid.density-mini .badge-category-tag {
+  font-size: 0.55rem;
+  padding: 1px 4px;
+  margin-bottom: 3px;
+}
+.leetcode-badges-grid.density-mini .badge-footer-row {
+  font-size: 0.62rem;
+  padding-top: 4px;
+}
+
+@media (max-width: 680px) {
+  .leetcode-badges-grid.density-trio,
+  .leetcode-badges-grid.density-compact {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .leetcode-badges-grid,
+  .leetcode-badges-grid.density-large,
+  .leetcode-badges-grid.density-trio,
+  .leetcode-badges-grid.density-medium,
+  .leetcode-badges-grid.density-compact,
+  .leetcode-badges-grid.density-mini {
     grid-template-columns: 1fr;
   }
 }
@@ -4717,6 +4887,19 @@ button:focus-visible {
 
 .milestone-card .badge-glow-ring {
   background: radial-gradient(circle, rgba(0, 212, 255, 0.2) 0%, transparent 70%);
+}
+
+.milestone-card .leetcode-badge-visual {
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.milestone-card .leetcode-badge-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .light .leetcode-filter-pills {

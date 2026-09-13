@@ -104,13 +104,23 @@ const LeetCodeSection = () => {
     return data.badges
   }, [data.badges, activeFilter])
 
-  // Compact default view (top 2 items), expandable to view all badges/milestones
+  // Dynamic display: if <= 4 items, show all directly; if > 4, show 4 with expand toggle
   const displayedBadges = useMemo(() => {
-    if (isBadgesExpanded) {
+    if (isBadgesExpanded || filteredBadges.length <= 4) {
       return filteredBadges
     }
-    return filteredBadges.slice(0, 2)
+    return filteredBadges.slice(0, 4)
   }, [filteredBadges, isBadgesExpanded])
+
+  // Dynamic density tier: scales card and image sizes down as item count grows
+  const densityClass = useMemo(() => {
+    const count = displayedBadges.length
+    if (count <= 2) return 'density-large'
+    if (count === 3) return 'density-trio'
+    if (count === 4) return 'density-medium'
+    if (count <= 6) return 'density-compact'
+    return 'density-mini'
+  }, [displayedBadges.length])
 
   const handleOpenBadge = (badge) => {
     const idx = filteredBadges.findIndex((b) => b.id === badge.id)
@@ -445,7 +455,7 @@ const LeetCodeSection = () => {
               </div>
             </div>
 
-            <div className="leetcode-badges-grid">
+            <div className={`leetcode-badges-grid ${densityClass}`}>
               {displayedBadges.map((badge, index) => (
                 <motion.div
                   key={badge.id}
@@ -484,8 +494,8 @@ const LeetCodeSection = () => {
               ))}
             </div>
 
-            {/* Expand / Collapse Button for Badges */}
-            {filteredBadges.length > 2 && (
+            {/* Expand / Collapse Button for Badges (shown when more than 4 items) */}
+            {filteredBadges.length > 4 && (
               <div className="leetcode-see-more-container">
                 <motion.button
                   type="button"
@@ -498,7 +508,7 @@ const LeetCodeSection = () => {
                   <span>
                     {isBadgesExpanded
                       ? 'Show Less Badges'
-                      : `See More Badges & Milestones (${filteredBadges.length - 2} more)`}
+                      : `See More Badges & Milestones (${filteredBadges.length - 4} more)`}
                   </span>
                 </motion.button>
               </div>
