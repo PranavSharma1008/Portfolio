@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { TypingText } from './TypingText'
 import ScrollReveal from './ScrollReveal'
@@ -7,6 +7,24 @@ import animatedAvatar from '../assets/animated.png'
 
 const Hero = () => {
   const [isResumeOpen, setIsResumeOpen] = useState(false)
+  const [scanKey, setScanKey] = useState(0)
+  const [isScanning, setIsScanning] = useState(true)
+  const [scanCompleted, setScanCompleted] = useState(false)
+
+  // Trigger top-to-bottom hacker scanning sequence
+  const triggerScan = () => {
+    setIsScanning(true)
+    setScanCompleted(false)
+    setScanKey((prev) => prev + 1)
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsScanning(false)
+      setScanCompleted(true)
+    }, 2900)
+    return () => clearTimeout(timer)
+  }, [scanKey])
 
   return (
     <section className="hero" id="home">
@@ -39,7 +57,7 @@ const Hero = () => {
             threshold={0.2}
             duration={0.6}
           >
-            I'm a <strong>Software Engineer</strong> specializing in building robust backend systems and scalable full-stack applications. Proficient in <strong>DSA, OOPS, Computer Networks, OS, and DBMS</strong>.
+            I'm a <strong>Software Engineer</strong> specializing in building robust backend systems and scalable full-stack applications. Proficient in <strong>DSA, OOPS, System Design, Computer Networks, OS, and DBMS</strong>.
           </ScrollReveal>
 
           <motion.div
@@ -79,41 +97,62 @@ const Hero = () => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.5, ease: 'easeOut' }}
         >
-          <div className="terminal-card">
+          <div
+            className={`terminal-card ${isScanning ? 'scan-active' : ''} ${scanCompleted ? 'scan-complete' : ''}`}
+            key={`terminal-card-${scanKey}`}
+            onClick={triggerScan}
+            title="Click to replay hacker scan animation"
+          >
+            {/* Terminal Window Header Bar */}
             <div className="terminal-dots">
               <span className="terminal-dot red"></span>
               <span className="terminal-dot yellow"></span>
               <span className="terminal-dot green"></span>
             </div>
             <div className="terminal-title">profile.sh — bash</div>
-            <div className="terminal-body">
-              <motion.div
-                className="terminal-avatar"
-                initial={{ opacity: 0, scale: 0.88 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.65, duration: 0.4, ease: 'easeOut' }}
-              >
-                <img src={animatedAvatar} alt="Pranav Sharma" />
-              </motion.div>
-              <div className="terminal-name">Pranav Sharma</div>
-              <div className="terminal-role">Software Engineer</div>
-              <div className="terminal-info">
-                <div className="terminal-info-row">
-                  <span className="info-label">email:</span>
-                  <span className="info-value">pranav2410991479@gmail.com</span>
+
+            {/* Hacker Scan Container */}
+            <div className="terminal-scan-area">
+              {/* Background Phosphor Cyber Scanlines */}
+              <div className="terminal-scanlines-bg" aria-hidden="true" />
+
+              {/* Moving Hacker Green Laser Bar */}
+              {isScanning && (
+                <div className="hacker-scan-bar" aria-hidden="true">
+                  <div className="hacker-bar-trail" />
+                  <div className="hacker-bar-laser">
+                    <span className="hacker-bar-tag">SYS.SCAN</span>
+                  </div>
+                  <div className="hacker-bar-glow" />
                 </div>
-                <div className="terminal-info-row">
-                  <span className="info-label">phone:</span>
-                  <span className="info-value">+91 9317290976</span>
+              )}
+
+              {/* Profile Details Revealed in Direct Alignment with the Moving Bar */}
+              <div className={`terminal-revealed-content ${isScanning ? 'is-scanning' : 'is-scanned'}`}>
+                <div className="terminal-body">
+                  <div className="terminal-avatar">
+                    <img src={animatedAvatar} alt="Pranav Sharma" />
+                  </div>
+                  <div className="terminal-name">Pranav Sharma</div>
+                  <div className="terminal-role">Software Engineer</div>
+                  <div className="terminal-info">
+                    <div className="terminal-info-row">
+                      <span className="info-label">email:</span>
+                      <span className="info-value">pranav2410991479@gmail.com</span>
+                    </div>
+                    <div className="terminal-info-row">
+                      <span className="info-label">phone:</span>
+                      <span className="info-value">+91 9317290976</span>
+                    </div>
+                    <div className="terminal-info-row">
+                      <span className="info-label">location:</span>
+                      <span className="info-value">India</span>
+                    </div>
+                  </div>
+                  <div className="terminal-status">
+                    <span>Available for opportunities</span>
+                  </div>
                 </div>
-                <div className="terminal-info-row">
-                  <span className="info-label">location:</span>
-                  <span className="info-value">India</span>
-                </div>
-              </div>
-              <div className="terminal-status">
-                <span className="status-dot"></span>
-                <span>Available for opportunities</span>
               </div>
             </div>
           </div>

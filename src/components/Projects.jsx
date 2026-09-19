@@ -1,7 +1,8 @@
-import ProjectsSlider from './ProjectsSlider'
+import ProjectsTerminal from './ProjectsTerminal'
 
 const Projects = () => {
-  return <ProjectsSlider />
+  return <ProjectsTerminal />
 }
 
 export default Projects
+

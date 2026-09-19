@@ -21,21 +21,14 @@ const githubIconSvg = (
   </svg>
 )
 
-const syncIconSvg = (
-  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"/>
-  </svg>
-)
 
 const LeetCodeSection = () => {
   const [data, setData] = useState(leetcodeInitialData)
   const [selectedBadgeIndex, setSelectedBadgeIndex] = useState(null)
   const [activeFilter, setActiveFilter] = useState('All')
-  const [isSyncing, setIsSyncing] = useState(false)
-  const [syncStatus, setSyncStatus] = useState(null)
   const [isBadgesExpanded, setIsBadgesExpanded] = useState(false)
 
-  // Instant hydration + immediate background live fetch on load
+  // Instant hydration + automated background live fetch on load
   useEffect(() => {
     let isMounted = true
 
@@ -50,48 +43,30 @@ const LeetCodeSection = () => {
       }
     } catch (e) {}
 
-    // 2. Automatically query live LeetCode GraphQL & GitHub on visit
-    const runAutoSync = async () => {
-      try {
-        const res = await syncLeetCodeWithLiveSources(true)
+    // 2. Listen for centralized live sync updates
+    const handleSynced = (e) => {
+      if (isMounted && e.detail) {
+        setData(e.detail)
+      }
+    }
+    window.addEventListener('leetcode-synced', handleSynced)
+
+    // 3. Automatically query live LeetCode GraphQL & GitHub on visit
+    syncLeetCodeWithLiveSources(true)
+      .then((res) => {
         if (isMounted && res && res.data) {
           setData(res.data)
         }
-      } catch (e) {
+      })
+      .catch((e) => {
         console.warn('LeetCode auto-sync error:', e)
-      }
-    }
-    runAutoSync()
+      })
 
     return () => {
       isMounted = false
+      window.removeEventListener('leetcode-synced', handleSynced)
     }
   }, [])
-
-  // Manual sync trigger
-  const handleManualSync = async () => {
-    if (isSyncing) return
-    setIsSyncing(true)
-    setSyncStatus({ message: 'Fetching all live data from LeetCode & GitHub...', type: 'info' })
-    try {
-      const res = await syncLeetCodeWithLiveSources(true)
-      if (res && res.data) {
-        setData(res.data)
-        setSyncStatus({
-          message: res.message,
-          type: res.isLive ? 'success' : 'info'
-        })
-      }
-    } catch (err) {
-      setSyncStatus({
-        message: 'Could not connect to live API. Loaded all verified cached data.',
-        type: 'info'
-      })
-    } finally {
-      setIsSyncing(false)
-      setTimeout(() => setSyncStatus(null), 5000)
-    }
-  }
 
   // Filtered badges / milestones
   const filteredBadges = useMemo(() => {
@@ -203,19 +178,6 @@ const LeetCodeSection = () => {
 
             {/* Action Buttons: Exact user-requested button names + Live Sync */}
             <div className="leetcode-action-btns">
-              <button
-                type="button"
-                onClick={handleManualSync}
-                disabled={isSyncing}
-                className={`certs-sync-btn ${isSyncing ? 'syncing' : ''}`}
-                title="Fetch live problem statistics and badges from LeetCode"
-              >
-                <span className={`sync-icon ${isSyncing ? 'spinning' : ''}`}>
-                  {syncIconSvg}
-                </span>
-                <span>{isSyncing ? 'Syncing...' : 'Sync Live Stats'}</span>
-              </button>
-
               <a
                 href={LEETCODE_PROFILE_URL}
                 target="_blank"
@@ -253,22 +215,6 @@ const LeetCodeSection = () => {
               </a>
             </div>
           </div>
-
-          {/* Sync Status Banner */}
-          <AnimatePresence>
-            {syncStatus && (
-              <motion.div
-                className={`certs-sync-banner ${syncStatus.type}`}
-                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
-                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <span className="banner-dot" />
-                <span>{syncStatus.message}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.div>
 
         {/* Highlight Metrics */}

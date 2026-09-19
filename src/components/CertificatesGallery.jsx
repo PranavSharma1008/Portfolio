@@ -10,67 +10,45 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isExpanded, setIsExpanded] = useState(initialExpanded)
   const [selectedCertIndex, setSelectedCertIndex] = useState(null)
-  const [isSyncing, setIsSyncing] = useState(false)
-  const [syncStatus, setSyncStatus] = useState(null) // { message: string, type: 'success' | 'info' | 'error' }
-
-  // Auto-sync with GitHub repository on mount (uses cache if available)
+  // Auto-sync with GitHub repository on mount
   useEffect(() => {
     let isMounted = true
-    const runInitialSync = async () => {
-      try {
-        const result = await syncWithGitHubRepo(certificates, false)
+
+    // 1. Hydrate from cache immediately
+    try {
+      const cached = localStorage.getItem('pranav_portfolio_github_certs_v2')
+      if (cached) {
+        const parsed = JSON.parse(cached)
+        if (Array.isArray(parsed?.certificates)) {
+          setAllCertificates(parsed.certificates)
+        }
+      }
+    } catch (e) {}
+
+    // 2. Listen for background auto-sync updates
+    const handleCertSync = (e) => {
+      if (isMounted && Array.isArray(e.detail)) {
+        setAllCertificates(e.detail)
+      }
+    }
+    window.addEventListener('certificates-synced', handleCertSync)
+
+    // 3. Automated background sync from GitHub repository
+    syncWithGitHubRepo(certificates, true)
+      .then((result) => {
         if (isMounted && result && Array.isArray(result.certificates)) {
           setAllCertificates(result.certificates)
-          if (result.newCount > 0) {
-            setSyncStatus({
-              message: `Synced ${result.newCount} new certificate(s) live from GitHub!`,
-              type: 'success'
-            })
-          }
         }
-      } catch (err) {
-        console.warn('Auto-sync error:', err)
-      }
-    }
-    runInitialSync()
+      })
+      .catch((err) => {
+        console.warn('Certificates auto-sync notice:', err)
+      })
+
     return () => {
       isMounted = false
+      window.removeEventListener('certificates-synced', handleCertSync)
     }
   }, [])
-
-  // Manual trigger to pull latest files directly from GitHub
-  const handleManualSync = async () => {
-    if (isSyncing) return
-    setIsSyncing(true)
-    setSyncStatus({ message: 'Connecting to GitHub repository...', type: 'info' })
-    try {
-      const result = await syncWithGitHubRepo(certificates, true)
-      if (result && Array.isArray(result.certificates)) {
-        setAllCertificates(result.certificates)
-        if (result.newCount > 0) {
-          setSyncStatus({
-            message: `Successfully synced ${result.newCount} new certificate(s) from GitHub!`,
-            type: 'success'
-          })
-        } else {
-          setSyncStatus({
-            message: `GitHub repository is up to date (${result.certificates.length} certificates).`,
-            type: 'info'
-          })
-        }
-      }
-    } catch (err) {
-      setSyncStatus({
-        message: 'Could not sync with GitHub. Showing offline certificates.',
-        type: 'error'
-      })
-    } finally {
-      setIsSyncing(false)
-      setTimeout(() => {
-        setSyncStatus(null)
-      }, 5000)
-    }
-  }
 
   // Category counts
   const categoryCounts = useMemo(() => {
@@ -199,49 +177,8 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
               </button>
             )}
           </div>
-
-          <button
-            type="button"
-            className={`certs-sync-btn ${isSyncing ? 'syncing' : ''}`}
-            onClick={handleManualSync}
-            disabled={isSyncing}
-            title="Fetch latest certificates from GitHub repository"
-          >
-            <svg
-              className={`sync-icon ${isSyncing ? 'spin' : ''}`}
-              viewBox="0 0 24 24"
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="23 4 23 10 17 10" />
-              <polyline points="1 20 1 14 7 14" />
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-            </svg>
-            <span>{isSyncing ? 'Syncing...' : 'Sync GitHub'}</span>
-          </button>
         </div>
       </div>
-
-      {/* Sync notification toast */}
-      <AnimatePresence>
-        {syncStatus && (
-          <motion.div
-            className={`certs-sync-banner ${syncStatus.type}`}
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-          >
-            <span className="banner-dot" />
-            <span>{syncStatus.message}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Category Filter Pills */}
       <div className="certs-filter-bar">

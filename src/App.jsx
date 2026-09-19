@@ -11,10 +11,16 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import TerminalLoader from './components/TerminalLoader'
+import { runAutoLiveSync } from './lib/autoLiveSync'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [activeSection, setActiveSection] = useState('home')
+
+  // Automatically fetch live data from both GitHub and LeetCode on every visit
+  useEffect(() => {
+    runAutoLiveSync(true)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {

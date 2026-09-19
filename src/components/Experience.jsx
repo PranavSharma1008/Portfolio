@@ -33,7 +33,7 @@ const skillBadges = [
 ]
 
 const csSkills = [
-  'DSA', 'OOPS', 'Computer Networks',
+  'DSA', 'OOPS', 'System Design', 'Computer Networks',
   'Operating Systems', 'DBMS', 'Problem Solving'
 ]
 

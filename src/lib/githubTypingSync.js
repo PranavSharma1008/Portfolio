@@ -135,6 +135,7 @@ export const syncTypingWithGitHub = async (staticItems, forceRefresh = false) =>
             timestamp: Date.now()
           })
         )
+        window.dispatchEvent(new CustomEvent('typing-synced', { detail: merged }))
       } catch (e) {
         console.warn('Failed saving typing cache:', e)
       }

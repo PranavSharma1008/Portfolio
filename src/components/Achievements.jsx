@@ -79,6 +79,7 @@ const achievements = [
 
 const Achievements = () => {
   const [solvedCount, setSolvedCount] = useState(leetcodeInitialData.totalSolved)
+  const [certsCount, setCertsCount] = useState(42)
 
   useEffect(() => {
     try {
@@ -89,6 +90,13 @@ const Achievements = () => {
           setSolvedCount(parsed.data.totalSolved)
         }
       }
+      const cachedCerts = localStorage.getItem('pranav_portfolio_github_certs_v2')
+      if (cachedCerts) {
+        const parsedC = JSON.parse(cachedCerts)
+        if (Array.isArray(parsedC?.certificates) && parsedC.certificates.length > 0) {
+          setCertsCount(parsedC.certificates.length)
+        }
+      }
     } catch (e) {}
 
     const handleSync = (e) => {
@@ -96,8 +104,18 @@ const Achievements = () => {
         setSolvedCount(e.detail.totalSolved)
       }
     }
+    const handleCertSync = (e) => {
+      if (Array.isArray(e.detail) && e.detail.length > 0) {
+        setCertsCount(e.detail.length)
+      }
+    }
+
     window.addEventListener('leetcode-synced', handleSync)
-    return () => window.removeEventListener('leetcode-synced', handleSync)
+    window.addEventListener('certificates-synced', handleCertSync)
+    return () => {
+      window.removeEventListener('leetcode-synced', handleSync)
+      window.removeEventListener('certificates-synced', handleCertSync)
+    }
   }, [])
 
   const displayAchievements = achievements.map((achievement) => {
@@ -106,6 +124,13 @@ const Achievements = () => {
         ...achievement,
         description: `Solved ${solvedCount} algorithm problems covering dynamic programming, graphs, trees, and system logic with 100-Day consistency badges.`,
         year: `${solvedCount} Solved`
+      }
+    }
+    if (achievement.isCertCard) {
+      return {
+        ...achievement,
+        description: `${certsCount} verified certificates across Generative AI, Python & Machine Learning, Intellectual Property Law, Design Thinking, and Cybersecurity.`,
+        year: `${certsCount} Verified`
       }
     }
     return achievement
@@ -174,7 +199,7 @@ const Achievements = () => {
                     className="ach-jump-certs-btn"
                     title="Jump to certificates gallery"
                   >
-                    Explore 42 Certificates ↓
+                    Explore {certsCount} Certificates ↓
                   </button>
                 )}
                 {achievement.isTypingCard && (

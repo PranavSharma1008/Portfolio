@@ -6,6 +6,7 @@ import {
   syncTypingWithGitHub,
   GITHUB_TYPING_REPO_URL
 } from '../lib/githubTypingSync'
+import keyboardStatIcon from '../assets/keyboard-stat-icon.png'
 
 const monkeyTypeIconSvg = (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -27,65 +28,45 @@ const TypingSection = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isExpanded, setIsExpanded] = useState(false)
   const [selectedItemIndex, setSelectedItemIndex] = useState(null)
-  const [isSyncing, setIsSyncing] = useState(false)
-  const [syncStatus, setSyncStatus] = useState(null)
-
   // Auto-sync on mount
   useEffect(() => {
     let isMounted = true
-    const runAutoSync = async () => {
-      try {
-        const res = await syncTypingWithGitHub(typingAchievements, false)
+
+    // 1. Hydrate from cache immediately
+    try {
+      const cached = localStorage.getItem('pranav_portfolio_github_typing_v1')
+      if (cached) {
+        const parsed = JSON.parse(cached)
+        if (Array.isArray(parsed?.items)) {
+          setItems(parsed.items)
+        }
+      }
+    } catch (e) {}
+
+    // 2. Listen for background auto-sync updates
+    const handleTypingSync = (e) => {
+      if (isMounted && Array.isArray(e.detail)) {
+        setItems(e.detail)
+      }
+    }
+    window.addEventListener('typing-synced', handleTypingSync)
+
+    // 3. Automated background sync from GitHub repository
+    syncTypingWithGitHub(typingAchievements, true)
+      .then((res) => {
         if (isMounted && res && Array.isArray(res.items)) {
           setItems(res.items)
-          if (res.newCount > 0) {
-            setSyncStatus({
-              message: `Synced ${res.newCount} new typing record(s) live from GitHub!`,
-              type: 'success'
-            })
-          }
         }
-      } catch (err) {
-        console.warn('Typing auto-sync error:', err)
-      }
-    }
-    runAutoSync()
+      })
+      .catch((err) => {
+        console.warn('Typing auto-sync notice:', err)
+      })
+
     return () => {
       isMounted = false
+      window.removeEventListener('typing-synced', handleTypingSync)
     }
   }, [])
-
-  // Manual sync trigger
-  const handleManualSync = async () => {
-    if (isSyncing) return
-    setIsSyncing(true)
-    setSyncStatus({ message: 'Connecting to TypingAchivenments repo...', type: 'info' })
-    try {
-      const res = await syncTypingWithGitHub(typingAchievements, true)
-      if (res && Array.isArray(res.items)) {
-        setItems(res.items)
-        if (res.newCount > 0) {
-          setSyncStatus({
-            message: `Synced ${res.newCount} new typing record(s) from GitHub!`,
-            type: 'success'
-          })
-        } else {
-          setSyncStatus({
-            message: `Typing repository is up to date (${res.items.length} records).`,
-            type: 'info'
-          })
-        }
-      }
-    } catch (err) {
-      setSyncStatus({
-        message: 'Could not connect to GitHub. Showing offline typing records.',
-        type: 'error'
-      })
-    } finally {
-      setIsSyncing(false)
-      setTimeout(() => setSyncStatus(null), 5000)
-    }
-  }
 
   // Category counts
   const categoryCounts = useMemo(() => {
@@ -226,7 +207,13 @@ const TypingSection = () => {
         {/* Highlight Stats Cards */}
         <div className="typing-stats-grid">
           <div className="typing-stat-box">
-            <div className="stat-icon">⚡</div>
+            <div className="stat-icon">
+              <img
+                src={keyboardStatIcon}
+                alt="Keyboard"
+                style={{ width: '28px', height: 'auto', display: 'block', objectFit: 'contain' }}
+              />
+            </div>
             <div className="stat-content">
               <span className="stat-number">82 WPM</span>
               <span className="stat-label">Peak Sprint Speed (10 Words)</span>
@@ -319,49 +306,8 @@ const TypingSection = () => {
                 </button>
               )}
             </div>
-
-            <button
-              type="button"
-              className={`certs-sync-btn ${isSyncing ? 'syncing' : ''}`}
-              onClick={handleManualSync}
-              disabled={isSyncing}
-              title="Sync latest images from TypingAchivenments repo"
-            >
-              <svg
-                className={`sync-icon ${isSyncing ? 'spin' : ''}`}
-                viewBox="0 0 24 24"
-                width="14"
-                height="14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="23 4 23 10 17 10" />
-                <polyline points="1 20 1 14 7 14" />
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-              </svg>
-              <span>{isSyncing ? 'Syncing...' : 'Sync GitHub'}</span>
-            </button>
           </div>
         </div>
-
-        {/* Sync notification toast */}
-        <AnimatePresence>
-          {syncStatus && (
-            <motion.div
-              className={`certs-sync-banner ${syncStatus.type}`}
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-            >
-              <span className="banner-dot" />
-              <span>{syncStatus.message}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Results count if searching */}
         {searchQuery && (

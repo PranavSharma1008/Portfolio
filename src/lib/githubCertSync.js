@@ -206,6 +206,7 @@ export const syncWithGitHubRepo = async (staticCertificates, forceRefresh = fals
             timestamp: Date.now()
           })
         )
+        window.dispatchEvent(new CustomEvent('certificates-synced', { detail: mergedList }))
       } catch (e) {
         console.warn('Failed saving GitHub certificates cache:', e)
       }
