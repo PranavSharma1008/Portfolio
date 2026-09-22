@@ -4,7 +4,8 @@ import typingAchievements, { TYPING_CATEGORIES } from '../data/typingAchievement
 import TypingModal from './TypingModal'
 import {
   syncTypingWithGitHub,
-  GITHUB_TYPING_REPO_URL
+  GITHUB_TYPING_REPO_URL,
+  CACHE_KEY
 } from '../lib/githubTypingSync'
 import keyboardStatIcon from '../assets/keyboard-stat-icon.png'
 
@@ -22,6 +23,20 @@ const githubIconSvg = (
 
 const MONKEYTYPE_PROFILE_URL = 'https://monkeytype.com/profile/SharmaPranav1008'
 
+export const formatWpmDisplay = (wpm) => {
+  if (!wpm || wpm.includes('Verified') || wpm.includes('Record') || wpm.includes('PB') || wpm.includes('High')) {
+    return '82 WPM'
+  }
+  return wpm.includes('WPM') ? wpm : `${wpm} WPM`
+}
+
+export const formatAccDisplay = (acc) => {
+  if (!acc || acc.includes('Touch') || acc.includes('Typing') || acc.includes('Consistency') || acc.includes('Consistent')) {
+    return '100%'
+  }
+  return acc.includes('%') ? acc : `${acc}%`
+}
+
 const TypingSection = () => {
   const [items, setItems] = useState(typingAchievements)
   const [activeCategory, setActiveCategory] = useState('All')
@@ -34,7 +49,7 @@ const TypingSection = () => {
 
     // 1. Hydrate from cache immediately
     try {
-      const cached = localStorage.getItem('pranav_portfolio_github_typing_v1')
+      const cached = localStorage.getItem(CACHE_KEY)
       if (cached) {
         const parsed = JSON.parse(cached)
         if (Array.isArray(parsed?.items)) {
@@ -77,9 +92,26 @@ const TypingSection = () => {
     return counts
   }, [items])
 
+  // Dynamic available categories
+  const availableCategories = useMemo(() => {
+    const baseList = ['All', 'Record Break', 'Monthly Achievements', 'Certificates']
+    const seen = new Set(baseList)
+    const list = [...baseList]
+    items.forEach((it) => {
+      if (it && it.category && typeof it.category === 'string') {
+        const cat = it.category.trim()
+        if (cat && !seen.has(cat)) {
+          seen.add(cat)
+          list.push(cat)
+        }
+      }
+    })
+    return list
+  }, [items])
+
   // Filtered items
   const filteredItems = useMemo(() => {
-    return items.filter((it) => {
+    const list = items.filter((it) => {
       const matchesCategory =
         activeCategory === 'All' || it.category === activeCategory
       const q = searchQuery.trim().toLowerCase()
@@ -93,6 +125,14 @@ const TypingSection = () => {
         it.date.toLowerCase().includes(q)
 
       return matchesCategory && matchesSearch
+    })
+
+    return [...list].sort((a, b) => {
+      const aCert = a.category === 'Certificates'
+      const bCert = b.category === 'Certificates'
+      if (aCert && !bCert) return -1
+      if (!aCert && bCert) return 1
+      return 0
     })
   }, [items, activeCategory, searchQuery])
 
@@ -246,7 +286,7 @@ const TypingSection = () => {
         <div className="certs-section-header typing-controls-header">
           {/* Category Filter Pills */}
           <div className="certs-filter-bar typing-filter-bar">
-            {TYPING_CATEGORIES.map((cat) => {
+            {availableCategories.map((cat) => {
               const count = categoryCounts[cat] || 0
               const isActive = activeCategory === cat
               return (
@@ -335,12 +375,6 @@ const TypingSection = () => {
                 whileHover={{ y: -6, transition: { duration: 0.2 } }}
                 onClick={() => handleOpenModal(index)}
               >
-                {item.isLiveGithub && (
-                  <div className="live-github-ribbon">
-                    <span>⚡ GitHub Live</span>
-                  </div>
-                )}
-
                 {/* Screenshot Preview */}
                 <div className="cert-card-preview typing-card-preview">
                   <img
@@ -366,12 +400,12 @@ const TypingSection = () => {
                 <div className="cert-card-content">
                   <div className="cert-card-top">
                     <span className="typing-speed-badge">
-                      ⚡ {item.wpm}
+                      ⚡ {formatWpmDisplay(item.wpm)}
                     </span>
                     <span className="typing-acc-badge">
-                      🎯 {item.accuracy}
+                      🎯 {formatAccDisplay(item.accuracy)}
                     </span>
-                    <span className="cert-card-date">{item.date}</span>
+                    <span className="cert-card-date">{item.date === 'Recently Uploaded' ? '2026' : item.date}</span>
                   </div>
 
                   <h4 className="cert-card-title" title={item.title}>

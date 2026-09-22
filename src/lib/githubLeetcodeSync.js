@@ -21,7 +21,7 @@ import {
   LEETCODE_BADGES_REPO_URL
 } from '../data/leetcodeData'
 
-export const CACHE_KEY = 'pranav_portfolio_leetcode_live_sync_v7'
+export const CACHE_KEY = 'pranav_portfolio_leetcode_live_sync_v10'
 export const CACHE_TTL_MS = 1000 * 60 * 5 // 5 minutes cache
 
 // Flush stale legacy cache keys from localStorage
@@ -33,7 +33,10 @@ if (typeof window !== 'undefined') {
       'pranav_portfolio_leetcode_live_sync_v3',
       'pranav_portfolio_leetcode_live_sync_v4',
       'pranav_portfolio_leetcode_live_sync_v5',
-      'pranav_portfolio_leetcode_live_sync_v6'
+      'pranav_portfolio_leetcode_live_sync_v6',
+      'pranav_portfolio_leetcode_live_sync_v7',
+      'pranav_portfolio_leetcode_live_sync_v8',
+      'pranav_portfolio_leetcode_live_sync_v9'
     ].forEach((k) => localStorage.removeItem(k))
   } catch (e) {}
 }
@@ -99,7 +102,12 @@ export const fetchLeetCodeLiveGraphQL = async (username = LEETCODE_USERNAME, for
 
     const res = await fetch(`/api/leetcode${cacheBust}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store',
+        'Pragma': 'no-cache'
+      },
+      cache: 'no-store',
       body: JSON.stringify({
         query: LEETCODE_GRAPHQL_QUERY,
         variables: { username }
@@ -128,7 +136,12 @@ export const fetchLeetCodeLiveGraphQL = async (username = LEETCODE_USERNAME, for
       `/.netlify/functions/leetcode?username=${encodeURIComponent(username)}${forceRefresh ? `&_t=${Date.now()}` : ''}`,
       {
         method: 'GET',
-        headers: { Accept: 'application/json' },
+        headers: {
+          Accept: 'application/json',
+          'Cache-Control': 'no-cache, no-store',
+          'Pragma': 'no-cache'
+        },
+        cache: 'no-store',
         signal: controller.signal
       }
     )
@@ -204,6 +217,9 @@ const parseGraphQLData = (user) => {
   const mediumSolved = medAc?.count ?? leetcodeInitialData.mediumSolved
   const hardSolved = hardAc?.count ?? leetcodeInitialData.hardSolved
 
+  const username = user.username || leetcodeInitialData.username
+  const realName = user.profile?.realName || leetcodeInitialData.realName || username
+  const name = user.profile?.realName || leetcodeInitialData.name || username
   const avatar = user.profile?.userAvatar || leetcodeInitialData.avatar
   const rawRanking = user.profile?.ranking
   const ranking = rawRanking ? Number(rawRanking).toLocaleString() : leetcodeInitialData.ranking
@@ -247,10 +263,17 @@ const parseGraphQLData = (user) => {
         map.set(tag.tagName, Math.max(map.get(tag.tagName) || 0, tag.problemsSolved))
       }
     }
+    // Consolidate redundant/overlapping tags (e.g. Tree & Binary Tree)
+    if (map.has('Tree') || map.has('Binary Tree')) {
+      const treeCount = Math.max(map.get('Tree') || 0, map.get('Binary Tree') || 0)
+      map.delete('Tree')
+      map.delete('Binary Tree')
+      map.set('Tree & Binary Tree', treeCount)
+    }
+
     const sorted = Array.from(map.entries())
       .filter(([_, count]) => count > 0)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
       .map(([name, count]) => ({ name, count }))
 
     if (sorted.length > 0) {
@@ -259,6 +282,9 @@ const parseGraphQLData = (user) => {
   }
 
   return {
+    username,
+    realName,
+    name,
     avatar,
     totalSolved,
     easySolved,
@@ -289,8 +315,15 @@ const parseFaisalData = (json) => {
     acceptanceRate = `${((acSubmissions / totalSubmissions) * 100).toFixed(2)}%`
   }
 
+  const username = json.username || LEETCODE_USERNAME
+  const realName = json.realName || json.name || leetcodeInitialData.realName || username
+  const name = json.name || json.realName || leetcodeInitialData.name || username
+
   return {
-    avatar: leetcodeInitialData.avatar,
+    username,
+    realName,
+    name,
+    avatar: json.avatar || leetcodeInitialData.avatar,
     totalSolved,
     easySolved,
     mediumSolved,
@@ -318,7 +351,14 @@ const parseAlfaData = (json) => {
     acceptanceRate = `${((acSubmissions / totalSubmissions) * 100).toFixed(2)}%`
   }
 
+  const username = json.username || LEETCODE_USERNAME
+  const realName = json.name || json.realName || leetcodeInitialData.realName || username
+  const name = json.name || json.realName || leetcodeInitialData.name || username
+
   return {
+    username,
+    realName,
+    name,
     avatar: json.avatar || leetcodeInitialData.avatar,
     totalSolved,
     easySolved,
@@ -550,8 +590,13 @@ export const syncLeetCodeWithLiveSources = async (forceRefresh = false) => {
   const mergedData = {
     ...leetcodeInitialData,
     ...(liveStats || {}),
+    username: liveStats?.username || leetcodeInitialData.username,
+    realName: liveStats?.realName || liveStats?.name || leetcodeInitialData.realName,
+    name: liveStats?.name || liveStats?.realName || leetcodeInitialData.name,
     badges: mergedBadges,
-    topics: liveStats?.topics || leetcodeInitialData.topics,
+    topics: (liveStats?.topics && Array.isArray(liveStats.topics) && liveStats.topics.length > 0)
+      ? liveStats.topics
+      : leetcodeInitialData.topics,
     repoLastUpdated: repoMeta?.pushedAt || 'Active Solutions Sync'
   }
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { formatWpmDisplay, formatAccDisplay } from './TypingSection'
 
 const TypingModal = ({
   isOpen,
@@ -207,7 +208,7 @@ const TypingModal = ({
               <div className="cert-info-col">
                 <span className="info-label">Speed & Accuracy</span>
                 <span className="info-value typing-stat-val">
-                  ⚡ {item.wpm} • 🎯 {item.accuracy}
+                  ⚡ {formatWpmDisplay(item.wpm)} • 🎯 {formatAccDisplay(item.accuracy)}
                 </span>
               </div>
               <div className="cert-info-col">

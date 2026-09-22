@@ -81,8 +81,10 @@ export const handler = async (event, context) => {
         'Content-Type': 'application/json',
         Referer: 'https://leetcode.com',
         Origin: 'https://leetcode.com',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Cache-Control': 'no-cache, no-store'
       },
+      cache: 'no-store',
       body: JSON.stringify({ query, variables })
     })
 
@@ -104,7 +106,7 @@ export const handler = async (event, context) => {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=600'
+        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0'
       },
       body: JSON.stringify(data)
     }

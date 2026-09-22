@@ -2,7 +2,12 @@ import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import certificates, { CERTIFICATE_CATEGORIES } from '../data/certificates'
 import CertificateModal from './CertificateModal'
-import { syncWithGitHubRepo, GITHUB_REPO_URL } from '../lib/githubCertSync'
+import {
+  syncWithGitHubRepo,
+  GITHUB_REPO_URL,
+  GITHUB_HACK_REPO_URL,
+  CACHE_KEY
+} from '../lib/githubCertSync'
 
 const CertificatesGallery = ({ initialExpanded = false }) => {
   const [allCertificates, setAllCertificates] = useState(certificates)
@@ -16,7 +21,7 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
 
     // 1. Hydrate from cache immediately
     try {
-      const cached = localStorage.getItem('pranav_portfolio_github_certs_v2')
+      const cached = localStorage.getItem(CACHE_KEY)
       if (cached) {
         const parsed = JSON.parse(cached)
         if (Array.isArray(parsed?.certificates)) {
@@ -59,6 +64,32 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     return counts
   }, [allCertificates])
 
+  // Dynamic available categories: "All" first, "Hackathons" second, followed by base + auto-detected topics
+  const availableCategories = useMemo(() => {
+    const baseList = ['All', 'Hackathons']
+    const seen = new Set(baseList)
+    const list = [...baseList]
+
+    CERTIFICATE_CATEGORIES.forEach((cat) => {
+      if (!seen.has(cat)) {
+        seen.add(cat)
+        list.push(cat)
+      }
+    })
+
+    allCertificates.forEach((c) => {
+      if (c && c.category && typeof c.category === 'string') {
+        const cat = c.category.trim()
+        if (cat && !seen.has(cat)) {
+          seen.add(cat)
+          list.push(cat)
+        }
+      }
+    })
+
+    return list
+  }, [allCertificates])
+
   // Filtered certificates
   const filteredCertificates = useMemo(() => {
     const list = allCertificates.filter((cert) => {
@@ -76,8 +107,25 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
       return matchesCategory && matchesSearch
     })
 
-    // Priority-first sorting: top technical credentials shown first, followed by secondary credentials
-    return [...list].sort((a, b) => (b.priority ?? 50) - (a.priority ?? 50))
+    // Safety deduplication by filename or identifier
+    const seenKeys = new Set()
+    const dedupedList = []
+    for (const cert of list) {
+      const key = (cert.fileName || cert.id || cert.title).toLowerCase().replace(/\s+\(1\)/g, '').trim()
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key)
+        dedupedList.push(cert)
+      }
+    }
+
+    // Priority-first sorting: Hackathon certificates ALWAYS show first, followed by other credentials
+    return [...dedupedList].sort((a, b) => {
+      const aIsHack = a.category === 'Hackathons' || a.isHackathon
+      const bIsHack = b.category === 'Hackathons' || b.isHackathon
+      if (aIsHack && !bIsHack) return -1
+      if (!aIsHack && bIsHack) return 1
+      return (b.priority ?? 50) - (a.priority ?? 50)
+    })
   }, [allCertificates, activeCategory, searchQuery])
 
   // Paginated/Display slice (if collapsed, show first 12; if expanded or searching, show all)
@@ -118,18 +166,30 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
         <div className="certs-header-left">
           <div className="certs-terminal-prompt">
             <span className="prompt-prefix">pranav@portfolio:~$</span>
-            <span className="prompt-cmd">git pull origin/certificates</span>
+            <span className="prompt-cmd">
+              {activeCategory === 'Hackathons'
+                ? 'git pull origin/hack-certificates'
+                : 'git pull origin/certificates'}
+            </span>
             <a
-              href={GITHUB_REPO_URL}
+              href={activeCategory === 'Hackathons' ? GITHUB_HACK_REPO_URL : GITHUB_REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="github-repo-link"
-              title="Open Certificates repository on GitHub"
+              title={
+                activeCategory === 'Hackathons'
+                  ? 'Open Hack-Certficates repository on GitHub'
+                  : 'Open Certificates repository on GitHub'
+              }
             >
               <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
               </svg>
-              <span>PranavSharma1008/Certificates ↗</span>
+              <span>
+                {activeCategory === 'Hackathons'
+                  ? 'PranavSharma1008/Hack-Certficates ↗'
+                  : 'PranavSharma1008/Certificates ↗'}
+              </span>
             </a>
           </div>
 
@@ -138,7 +198,7 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
             <span className="certs-count-badge">{allCertificates.length}</span>
           </h3>
           <p className="certs-subtext">
-            Auto-synced with GitHub repository. Click any certificate to inspect in high-resolution, verify credentials, or download.
+            Auto-synced with GitHub repositories (Certificates & Hack-Certficates). Click any certificate to inspect in high-resolution, verify credentials, or download.
           </p>
         </div>
 
@@ -182,7 +242,7 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
 
       {/* Category Filter Pills */}
       <div className="certs-filter-bar">
-        {CERTIFICATE_CATEGORIES.map((cat) => {
+        {availableCategories.map((cat) => {
           const count = categoryCounts[cat] || 0
           const isActive = activeCategory === cat
           return (
@@ -242,10 +302,10 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
                   </div>
                 )}
 
-                {/* Live from GitHub Badge */}
-                {cert.isLiveGithub && (
-                  <div className="live-github-ribbon">
-                    <span>⚡ GitHub Live</span>
+                {/* Hackathon Ribbon */}
+                {cert.isHackathon && (
+                  <div className="hackathon-ribbon">
+                    <span>🏆 Hackathon</span>
                   </div>
                 )}
 
@@ -343,7 +403,13 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
       ) : (
         <div className="certs-empty-state">
           <div className="empty-icon">📂</div>
-          <p>No certificates found matching "{searchQuery}"</p>
+          <p>
+            {searchQuery
+              ? `No certificates found matching "${searchQuery}"`
+              : activeCategory !== 'All'
+              ? `No certificates found in ${activeCategory}`
+              : 'No certificates found'}
+          </p>
           <button
             type="button"
             className="cmd-btn"
@@ -352,7 +418,7 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
               setActiveCategory('All')
             }}
           >
-            Reset Filters
+            {activeCategory !== 'All' || searchQuery ? 'View All Certificates' : 'Reset Filters'}
           </button>
         </div>
       )}

@@ -6,7 +6,7 @@
  * 1. LeetCode GraphQL & Public Mirror APIs (Problem Counts, Rankings, Avatar)
  * 2. GitHub LeetcodeBadges Repository (Milestone badges 250+, 200, 150)
  * 3. GitHub LeetcodeSerieGithub Repository (Latest solutions push activity)
- * 4. GitHub Certificates Repository (Newly uploaded certificates)
+ * 4. GitHub Certificates & Hack-Certficates Repositories (Course credentials & hackathons)
  * 5. GitHub TypingAchivenments Repository (Typing speed milestone screenshots)
  * 
  * Runs silently in the background with zero user action required.

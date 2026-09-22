@@ -83,6 +83,7 @@ export default async function handler(req, res) {
     })
 
     const data = await leetcodeRes.json()
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0')
     res.status(200).json(data)
   } catch (error) {
     res.status(500).json({ error: error.message })

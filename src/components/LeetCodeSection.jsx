@@ -27,6 +27,7 @@ const LeetCodeSection = () => {
   const [selectedBadgeIndex, setSelectedBadgeIndex] = useState(null)
   const [activeFilter, setActiveFilter] = useState('All')
   const [isBadgesExpanded, setIsBadgesExpanded] = useState(false)
+  const [isTopicsExpanded, setIsTopicsExpanded] = useState(false)
 
   // Instant hydration + automated background live fetch on load
   useEffect(() => {
@@ -96,6 +97,15 @@ const LeetCodeSection = () => {
     if (count <= 6) return 'density-compact'
     return 'density-mini'
   }, [displayedBadges.length])
+
+  // Topics mastery display computation
+  const topicsList = useMemo(() => data.topics || [], [data.topics])
+  const displayedTopics = useMemo(() => {
+    if (isTopicsExpanded || topicsList.length <= 6) {
+      return topicsList
+    }
+    return topicsList.slice(0, 6)
+  }, [topicsList, isTopicsExpanded])
 
   const handleOpenBadge = (badge) => {
     const idx = filteredBadges.findIndex((b) => b.id === badge.id)
@@ -183,7 +193,7 @@ const LeetCodeSection = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="leetcode-main-btn leetcode-btn-profile"
-                title="Open LeetCode Profile for SharmaPranav1008"
+                title={`Open LeetCode Profile for ${data.realName || data.username || 'SharmaPranav1008'}`}
               >
                 <span className="leetcode-btn-icon">{leetcodeIconSvg}</span>
                 <span>Leetcode Profile</span>
@@ -279,11 +289,6 @@ const LeetCodeSection = () => {
             transition={{ duration: 0.5 }}
           >
             <div className="leetcode-card-header">
-              <div className="terminal-dots">
-                <span className="terminal-dot red" />
-                <span className="terminal-dot yellow" />
-                <span className="terminal-dot green" />
-              </div>
               <span className="leetcode-total-indicator">{data.totalSolved} Problems</span>
             </div>
 
@@ -340,17 +345,36 @@ const LeetCodeSection = () => {
 
             {/* Topic Mastery Tags */}
             <div className="leetcode-topics-section">
-              <div className="leetcode-topics-title">
-                <span>$ leetcode --skills --top-topics</span>
+              <div className="leetcode-topics-header">
+                <div className="leetcode-topics-title">
+                  <span>$ leetcode --skills --top-topics</span>
+                </div>
+                <span className="leetcode-topics-hint" title="Algorithm skill tags across solved problems">
+                  Multi-tagged across {data.totalSolved} solved
+                </span>
               </div>
               <div className="leetcode-topics-grid">
-                {data.topics.map((t, idx) => (
-                  <div key={idx} className="leetcode-topic-pill">
+                {displayedTopics.map((t, idx) => (
+                  <div key={t.name || idx} className="leetcode-topic-pill">
                     <span className="topic-name">{t.name}</span>
                     <span className="topic-count">{t.count}</span>
                   </div>
                 ))}
               </div>
+
+              {topicsList.length > 6 && (
+                <div className="leetcode-topics-toggle-container">
+                  <button
+                    type="button"
+                    className="leetcode-topics-toggle-btn"
+                    onClick={() => setIsTopicsExpanded(!isTopicsExpanded)}
+                    aria-expanded={isTopicsExpanded}
+                  >
+                    <span>{isTopicsExpanded ? 'Show Less Topics' : `See More Topics (${topicsList.length - 6} more)`}</span>
+                    <span className="btn-icon">{isTopicsExpanded ? '▲' : '▼'}</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Notice for Solutions Code Repo */}
@@ -363,7 +387,6 @@ const LeetCodeSection = () => {
                 Contains complete problem-solving code and algorithmic solutions with documented time & space complexity analysis.
               </p>
               <div className="repo-notice-status-row">
-                <span className="repo-status-badge">● Sync Status: {data.repoLastUpdated || 'Up to date'}</span>
                 <a
                   href={LEETCODE_SERIE_REPO_URL}
                   target="_blank"
@@ -474,7 +497,14 @@ const LeetCodeSection = () => {
               </div>
               <div className="callout-text-area">
                 <div className="callout-user-row">
-                  <span className="callout-username">@SharmaPranav1008</span>
+                  {data.realName && data.realName.toLowerCase() !== (data.username || '').toLowerCase() ? (
+                    <>
+                      <span className="callout-display-name">{data.realName}</span>
+                      <span className="callout-username">@{data.username || 'SharmaPranav1008'}</span>
+                    </>
+                  ) : (
+                    <span className="callout-username">@{data.username || 'SharmaPranav1008'}</span>
+                  )}
                   <span className="callout-verified">Verified LeetCoder</span>
                 </div>
                 <p className="callout-bio">

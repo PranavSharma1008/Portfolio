@@ -3242,6 +3242,19 @@ button:focus-visible {
   transform: translateY(-1px);
 }
 
+.ach-jump-linkedin-btn {
+  color: #00d4ff;
+  background: rgba(10, 102, 194, 0.16);
+  border: 1px solid rgba(10, 102, 194, 0.4);
+  text-decoration: none;
+}
+
+.ach-jump-linkedin-btn:hover {
+  background: rgba(10, 102, 194, 0.3);
+  border-color: #0A66C2;
+  color: #ffffff;
+}
+
 .certificates-showcase-container {
   margin-top: 56px;
   padding-top: 48px;
@@ -3584,12 +3597,12 @@ button:focus-visible {
   letter-spacing: 0.04em;
 }
 
-.live-github-ribbon {
+.hackathon-ribbon {
   position: absolute;
   top: 10px;
-  left: 10px;
+  right: 10px;
   z-index: 5;
-  background: linear-gradient(135deg, #00ff9d, #00d4ff);
+  background: linear-gradient(135deg, #00ff9d, #10b981);
   color: #031b11;
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -3597,7 +3610,12 @@ button:focus-visible {
   padding: 3px 8px;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.live-github-ribbon {
+  display: none !important;
 }
 
 .cert-card-preview {
@@ -4859,6 +4877,7 @@ button:focus-visible {
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -4962,11 +4981,30 @@ button:focus-visible {
   background: rgba(0, 0, 0, 0.1);
 }
 
+.leetcode-topics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .leetcode-topics-title {
   font-family: var(--font-mono);
   font-size: 0.78rem;
   color: var(--text-muted);
-  margin-bottom: 14px;
+}
+
+.leetcode-topics-hint {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 255, 157, 0.2);
+  letter-spacing: 0.01em;
 }
 
 .leetcode-topics-grid {
@@ -5010,6 +5048,38 @@ button:focus-visible {
   background: var(--cyan-dim);
   padding: 1px 6px;
   border-radius: 4px;
+}
+
+.leetcode-topics-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.leetcode-topics-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.leetcode-topics-toggle-btn:hover {
+  background: rgba(0, 212, 255, 0.08);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.leetcode-topics-toggle-btn .btn-icon {
+  font-size: 0.65rem;
 }
 
 /* Repo Notice at bottom of card */
@@ -5450,11 +5520,18 @@ button:focus-visible {
   flex-wrap: wrap;
 }
 
+.callout-display-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.12rem;
+  color: var(--text-primary);
+}
+
 .callout-username {
   font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--cyan);
 }
 
 .callout-verified {
@@ -5748,6 +5825,24 @@ button:focus-visible {
 .light .leetcode-topic-pill {
   background: #ffffff;
   border-color: #e2e8f0;
+}
+
+.light .leetcode-topics-toggle-btn {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+.light .leetcode-topics-toggle-btn:hover {
+  background: #f1f5f9;
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+.light .leetcode-topics-hint {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.25);
 }
 
 .light .diff-progress-bar {
