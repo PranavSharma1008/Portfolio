@@ -12,8 +12,13 @@
   force = true
 
 [[redirects]]
+<<<<<<< HEAD
   from = "/api/linkedin"
   to = "/.netlify/functions/linkedin"
+=======
+  from = "/api/certificates"
+  to = "/.netlify/functions/certificates"
+>>>>>>> 1020bc8 (Foix linkedin coun)
   status = 200
   force = true
 

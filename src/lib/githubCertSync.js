@@ -16,7 +16,7 @@ export const GITHUB_HACK_REPO_NAME = 'Hack-Certficates'
 export const GITHUB_HACK_REPO_BRANCH = 'main'
 export const GITHUB_HACK_REPO_URL = `https://github.com/${GITHUB_REPO_OWNER}/${GITHUB_HACK_REPO_NAME}`
 
-export const CACHE_KEY = 'pranav_portfolio_github_certs_v6'
+export const CACHE_KEY = 'pranav_portfolio_github_certs_v7'
 export const CACHE_TTL_MS = 1000 * 60 * 15 // 15 minutes cache
 
 // Flush stale legacy cache keys from localStorage
@@ -27,7 +27,8 @@ if (typeof window !== 'undefined') {
       'pranav_portfolio_github_certs_v2',
       'pranav_portfolio_github_certs_v3',
       'pranav_portfolio_github_certs_v4',
-      'pranav_portfolio_github_certs_v5'
+      'pranav_portfolio_github_certs_v5',
+      'pranav_portfolio_github_certs_v6'
     ].forEach((k) => localStorage.removeItem(k))
   } catch (e) {}
 }
@@ -256,41 +257,108 @@ const fetchJsDelivrTree = async (owner, repo, branch = 'main') => {
 }
 
 /**
+ * Fast verification against raw.githubusercontent.com to ensure file actually exists on GitHub.
+ * Returns false if deleted (HTTP 404) or unreachable.
+ */
+export const verifyRawFileExists = async (owner, repo, branch, path) => {
+  try {
+    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${encodeURI(path)}`
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 3500)
+    const res = await fetch(rawUrl, {
+      method: 'HEAD',
+      cache: 'no-cache',
+      signal: controller.signal
+    })
+    clearTimeout(timer)
+    return res.ok && res.status === 200
+  } catch (e) {
+    return false
+  }
+}
+
+/**
  * Fetch Git Tree recursively with multi-tiered fallbacks:
- * 1. jsDelivr Data API (0 rate limits, instant)
- * 2. Official GitHub REST API
+ * 1. Serverless proxy endpoint (/api/certificates, /.netlify/functions/certificates)
+ * 2. Official GitHub REST API (Direct, real-time source of truth)
+ * 3. jsDelivr Data API with mandatory file existence verification
  */
 const fetchRepoTree = async (owner, repo, branch = 'main') => {
-  // Strategy 1: jsDelivr Data API
-  const cdnResult = await fetchJsDelivrTree(owner, repo, branch)
-  if (cdnResult && Array.isArray(cdnResult.tree) && cdnResult.tree.length > 0) {
-    return cdnResult
+  // Strategy 1: Serverless proxy endpoints (if available)
+  const proxyEndpoints = [
+    `/api/certificates?repo=${encodeURIComponent(repo)}`,
+    `/.netlify/functions/certificates?repo=${encodeURIComponent(repo)}`
+  ]
+
+  for (const endpoint of proxyEndpoints) {
+    try {
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), 3500)
+      const res = await fetch(endpoint, {
+        headers: { Accept: 'application/json' },
+        signal: controller.signal
+      })
+      clearTimeout(timer)
+      if (res.ok) {
+        const data = await res.json()
+        if (data && Array.isArray(data.tree)) {
+          return { tree: data.tree, empty: data.tree.length === 0, source: 'serverless' }
+        }
+      }
+    } catch (e) {}
   }
 
-  // Strategy 2: Official GitHub REST API
+  // Strategy 2: Official GitHub REST API (Direct source of truth)
   try {
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 4000)
     const res = await fetch(apiUrl, {
       headers: {
         Accept: 'application/vnd.github.v3+json'
-      }
+      },
+      signal: controller.signal
     })
+    clearTimeout(timer)
 
+    // HTTP 404 or 409 means the repository or branch is empty (0 files)
     if (res.status === 409 || res.status === 404) {
-      return { tree: [], empty: true }
+      return { tree: [], empty: true, source: 'github-empty' }
     }
 
-    if (!res.ok) {
-      console.warn(`GitHub API notice for ${repo} (HTTP ${res.status})`)
-      return cdnResult || { tree: [], empty: false, error: `HTTP ${res.status}` }
+    if (res.ok) {
+      const data = await res.json()
+      const rawTree = Array.isArray(data.tree) ? data.tree : []
+      return { tree: rawTree, empty: rawTree.length === 0, source: 'github-api' }
     }
 
-    const data = await res.json()
-    return { tree: Array.isArray(data.tree) ? data.tree : [], empty: false }
+    if (res.status === 403 || res.status === 429) {
+      console.warn(`[CertSync] GitHub API rate limit for ${repo} (HTTP ${res.status}), using verified fallback`)
+    }
   } catch (err) {
-    console.warn(`Failed fetching git tree for ${repo}:`, err)
-    return cdnResult || { tree: [], empty: false, error: err.message }
+    console.warn(`[CertSync] GitHub API direct request notice for ${repo}:`, err?.message || err)
   }
+
+  // Strategy 3: jsDelivr Data API Fallback with mandatory file existence verification
+  const cdnResult = await fetchJsDelivrTree(owner, repo, branch)
+  if (cdnResult && Array.isArray(cdnResult.tree)) {
+    // Discard any files that no longer exist on raw.githubusercontent.com
+    const verifiedTree = []
+    await Promise.all(
+      cdnResult.tree.map(async (file) => {
+        if (file.type !== 'blob') return
+        const exists = await verifyRawFileExists(owner, repo, branch, file.path)
+        if (exists) {
+          verifiedTree.push(file)
+        } else {
+          console.info(`[CertSync] Discarded deleted/unreachable file from ${repo}: ${file.path}`)
+        }
+      })
+    )
+    return { tree: verifiedTree, empty: verifiedTree.length === 0, source: 'cdn-verified' }
+  }
+
+  return { tree: [], empty: true, source: 'none' }
 }
 
 /**
@@ -372,6 +440,13 @@ export const syncWithGitHubRepo = async (staticCertificates, forceRefresh = fals
       const isPdf = ext === '.pdf'
       const rawUrl = `https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_HACK_REPO_NAME}/${GITHUB_HACK_REPO_BRANCH}/${encodeURI(path)}`
 
+      // Verify file is reachable on GitHub raw
+      const exists = await verifyRawFileExists(GITHUB_REPO_OWNER, GITHUB_HACK_REPO_NAME, GITHUB_HACK_REPO_BRANCH, path)
+      if (!exists) {
+        console.warn(`[CertSync] Skipping unreachable/deleted hackathon certificate: ${cleanName}`)
+        continue
+      }
+
       newHackItems.push({
         id: `hack-${item.sha.slice(0, 8)}`,
         title,
@@ -421,6 +496,13 @@ export const syncWithGitHubRepo = async (staticCertificates, forceRefresh = fals
           : detectIssuerBadge(title, path)
       const isPdf = ext === '.pdf'
       const rawUrl = `https://raw.githubusercontent.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/${GITHUB_REPO_BRANCH}/${encodeURI(path)}`
+
+      // Verify file is reachable on GitHub raw
+      const exists = await verifyRawFileExists(GITHUB_REPO_OWNER, GITHUB_REPO_NAME, GITHUB_REPO_BRANCH, path)
+      if (!exists) {
+        console.warn(`[CertSync] Skipping unreachable/deleted certificate: ${cleanName}`)
+        continue
+      }
 
       newCertItems.push({
         id: `gh-${item.sha.slice(0, 8)}`,

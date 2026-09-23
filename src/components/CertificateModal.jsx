@@ -14,11 +14,13 @@ const CertificateModal = ({
     certificate?.thumbnailUrl ? 'preview' : 'pdf'
   )
   const [isZoomed, setIsZoomed] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   // Reset states when certificate changes
   useEffect(() => {
     setViewMode(certificate?.thumbnailUrl ? 'preview' : 'pdf')
     setIsZoomed(false)
+    setImageError(false)
   }, [certificate?.id, certificate?.thumbnailUrl])
 
   // Keyboard navigation & lock scroll
@@ -278,15 +280,32 @@ const CertificateModal = ({
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.96 }}
                       transition={{ duration: 0.25 }}
-                      onClick={() => setIsZoomed(!isZoomed)}
-                      title="Click to toggle zoom"
+                      onClick={() => !imageError && setIsZoomed(!isZoomed)}
+                      title={imageError ? 'Certificate image unavailable' : 'Click to toggle zoom'}
                     >
-                      <img
-                        src={certificate.thumbnailUrl || certificate.fileUrl}
-                        alt={certificate.title}
-                        className="cert-view-img"
-                        loading="eager"
-                      />
+                      {imageError ? (
+                        <div className="cert-fallback-box" style={{ padding: '40px 20px', textAlign: 'center' }}>
+                          <p style={{ color: '#ef4444', marginBottom: '16px' }}>Certificate file is no longer available in the repository.</p>
+                          {certificate.verifyUrl && (
+                            <a
+                              href={certificate.verifyUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="cmd-btn cmd-btn-primary"
+                            >
+                              Check GitHub Repo
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        <img
+                          src={certificate.thumbnailUrl || certificate.fileUrl}
+                          alt={certificate.title}
+                          className="cert-view-img"
+                          loading="eager"
+                          onError={() => setImageError(true)}
+                        />
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>

@@ -27,7 +27,11 @@ const LeetCodeSection = () => {
   const [selectedBadgeIndex, setSelectedBadgeIndex] = useState(null)
   const [activeFilter, setActiveFilter] = useState('All')
   const [isBadgesExpanded, setIsBadgesExpanded] = useState(false)
-  const [isTopicsExpanded, setIsTopicsExpanded] = useState(false)
+  const [expandedLevels, setExpandedLevels] = useState({
+    advanced: false,
+    intermediate: false,
+    fundamental: true // Initially matches Screenshot 1 with fundamental expanded
+  })
 
   // Instant hydration + automated background live fetch on load
   useEffect(() => {
@@ -98,14 +102,37 @@ const LeetCodeSection = () => {
     return 'density-mini'
   }, [displayedBadges.length])
 
-  // Topics mastery display computation
-  const topicsList = useMemo(() => data.topics || [], [data.topics])
-  const displayedTopics = useMemo(() => {
-    if (isTopicsExpanded || topicsList.length <= 6) {
-      return topicsList
-    }
-    return topicsList.slice(0, 6)
-  }, [topicsList, isTopicsExpanded])
+  // LeetCode Skills Category (Advanced, Intermediate, Fundamental) computation
+  const toggleLevel = (key) => {
+    setExpandedLevels((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
+  }
+
+  const skillsLevels = useMemo(() => {
+    const raw = data.skillsByLevel || leetcodeInitialData.skillsByLevel || {}
+    return [
+      {
+        key: 'advanced',
+        name: 'Advanced',
+        dotColor: 'red',
+        items: raw.advanced || []
+      },
+      {
+        key: 'intermediate',
+        name: 'Intermediate',
+        dotColor: 'yellow',
+        items: raw.intermediate || []
+      },
+      {
+        key: 'fundamental',
+        name: 'Fundamental',
+        dotColor: 'green',
+        items: raw.fundamental || []
+      }
+    ]
+  }, [data.skillsByLevel])
 
   const handleOpenBadge = (badge) => {
     const idx = filteredBadges.findIndex((b) => b.id === badge.id)
@@ -343,38 +370,54 @@ const LeetCodeSection = () => {
               </div>
             </div>
 
-            {/* Topic Mastery Tags */}
-            <div className="leetcode-topics-section">
-              <div className="leetcode-topics-header">
-                <div className="leetcode-topics-title">
-                  <span>$ leetcode --skills --top-topics</span>
+            {/* LeetCode Skills Category (Advanced, Intermediate, Fundamental) */}
+            <div className="leetcode-skills-section">
+              <div className="leetcode-skills-header">
+                <div className="leetcode-skills-title">
+                  <span className="skills-main-title">Skills</span>
                 </div>
-                <span className="leetcode-topics-hint" title="Algorithm skill tags across solved problems">
+                <span className="leetcode-skills-hint" title="Algorithm skill tags across solved problems">
                   Multi-tagged across {data.totalSolved} solved
                 </span>
               </div>
-              <div className="leetcode-topics-grid">
-                {displayedTopics.map((t, idx) => (
-                  <div key={t.name || idx} className="leetcode-topic-pill">
-                    <span className="topic-name">{t.name}</span>
-                    <span className="topic-count">{t.count}</span>
-                  </div>
-                ))}
-              </div>
 
-              {topicsList.length > 6 && (
-                <div className="leetcode-topics-toggle-container">
-                  <button
-                    type="button"
-                    className="leetcode-topics-toggle-btn"
-                    onClick={() => setIsTopicsExpanded(!isTopicsExpanded)}
-                    aria-expanded={isTopicsExpanded}
-                  >
-                    <span>{isTopicsExpanded ? 'Show Less Topics' : `See More Topics (${topicsList.length - 6} more)`}</span>
-                    <span className="btn-icon">{isTopicsExpanded ? '▲' : '▼'}</span>
-                  </button>
-                </div>
-              )}
+              <div className="leetcode-skills-groups">
+                {skillsLevels.map((level) => {
+                  const isExpanded = Boolean(expandedLevels[level.key])
+                  const visibleItems = isExpanded ? level.items : level.items.slice(0, 3)
+
+                  return (
+                    <div key={level.key} className="leetcode-skill-group">
+                      <div className="leetcode-skill-group-title">
+                        <span className={`skill-dot dot-${level.dotColor}`} />
+                        <span className="skill-level-name">{level.name}</span>
+                      </div>
+
+                      <div className="leetcode-skill-pills-row">
+                        {visibleItems.map((item, idx) => (
+                          <div key={item.name || idx} className="leetcode-skill-item">
+                            <span className="leetcode-skill-pill-name">{item.name}</span>
+                            <span className="leetcode-skill-multiplier">x{item.count}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {level.items.length > 3 && (
+                        <div className="leetcode-skill-toggle-wrap">
+                          <button
+                            type="button"
+                            className="leetcode-skill-toggle-btn"
+                            onClick={() => toggleLevel(level.key)}
+                            aria-expanded={isExpanded}
+                          >
+                            {isExpanded ? 'Show less' : 'Show more'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
 
             {/* Notice for Solutions Code Repo */}

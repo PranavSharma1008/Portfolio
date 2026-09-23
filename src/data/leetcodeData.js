@@ -12,11 +12,52 @@ export const leetcodeInitialData = {
   repoUrl: LEETCODE_SERIE_REPO_URL,
   badgesRepoUrl: LEETCODE_BADGES_REPO_URL,
   ranking: '572,236',
-  totalSolved: 277,
-  easySolved: 184,
+  totalSolved: 278,
+  easySolved: 185,
   mediumSolved: 88,
   hardSolved: 5,
   acceptanceRate: '70.07%',
+  skillsByLevel: {
+    advanced: [
+      { name: 'Dynamic Programming', count: 28 },
+      { name: 'Backtracking', count: 9 },
+      { name: 'Divide and Conquer', count: 6 },
+      { name: 'Monotonic Stack', count: 4 },
+      { name: 'Game Theory', count: 2 },
+      { name: 'Rolling Hash', count: 2 },
+      { name: 'Trie', count: 2 },
+      { name: 'Data Stream', count: 1 },
+      { name: 'Quickselect', count: 1 },
+      { name: 'Union-Find', count: 1 }
+    ],
+    intermediate: [
+      { name: 'Hash Table', count: 50 },
+      { name: 'Tree', count: 47 },
+      { name: 'Binary Tree', count: 46 },
+      { name: 'Math', count: 44 },
+      { name: 'Depth-First Search', count: 39 },
+      { name: 'Breadth-First Search', count: 21 },
+      { name: 'Recursion', count: 15 },
+      { name: 'Bit Manipulation', count: 15 },
+      { name: 'Greedy', count: 14 },
+      { name: 'Binary Search', count: 13 },
+      { name: 'Sliding Window', count: 9 },
+      { name: 'Design', count: 7 },
+      { name: 'Brainteaser', count: 1 }
+    ],
+    fundamental: [
+      { name: 'Array', count: 115 },
+      { name: 'String', count: 83 },
+      { name: 'Two Pointers', count: 43 },
+      { name: 'Sorting', count: 31 },
+      { name: 'Linked List', count: 27 },
+      { name: 'Stack', count: 21 },
+      { name: 'Simulation', count: 14 },
+      { name: 'Queue', count: 9 },
+      { name: 'Matrix', count: 7 },
+      { name: 'Enumeration', count: 2 }
+    ]
+  },
   badges: [
     {
       id: '100-days-2026',

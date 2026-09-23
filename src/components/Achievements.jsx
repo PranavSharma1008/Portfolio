@@ -8,6 +8,7 @@ import { CACHE_KEY as GITHUB_CERTS_CACHE_KEY } from '../lib/githubCertSync'
 import {
   syncLinkedInStats,
   LINKEDIN_PROFILE_URL,
+  DEFAULT_FOLLOWERS,
   CACHE_KEY as LINKEDIN_CACHE_KEY
 } from '../lib/linkedinSync'
 
@@ -90,8 +91,8 @@ const achievements = [
   },
   {
     title: 'LinkedIn Network',
-    description: 'Active professional network of 700+ engineers, founders, and industry leaders sharing insights on DSA, full-stack systems, and modern AI development.',
-    year: '700+ Connections',
+    description: `Active professional network of ${DEFAULT_FOLLOWERS} followers and connections sharing insights on DSA, full-stack systems, and modern AI development.`,
+    year: `${DEFAULT_FOLLOWERS} Followers`,
     badgeIcon: linkedinIcon,
     isLinkedInCard: true,
     links: [
@@ -107,7 +108,7 @@ const achievements = [
 const Achievements = () => {
   const [solvedCount, setSolvedCount] = useState(leetcodeInitialData.totalSolved)
   const [certsCount, setCertsCount] = useState(certificates.length)
-  const [connectionsCount, setConnectionsCount] = useState('700+')
+  const [followersCount, setFollowersCount] = useState(DEFAULT_FOLLOWERS)
 
   useEffect(() => {
     try {
@@ -128,8 +129,8 @@ const Achievements = () => {
       const cachedLi = localStorage.getItem(LINKEDIN_CACHE_KEY)
       if (cachedLi) {
         const parsedLi = JSON.parse(cachedLi)
-        if (parsedLi?.data?.connections) {
-          setConnectionsCount(parsedLi.data.connections)
+        if (parsedLi?.data?.followers || parsedLi?.data?.connections) {
+          setFollowersCount(parsedLi.data.followers || parsedLi.data.connections)
         }
       }
     } catch (e) {}
@@ -145,8 +146,8 @@ const Achievements = () => {
       }
     }
     const handleLiSync = (e) => {
-      if (e.detail?.connections) {
-        setConnectionsCount(e.detail.connections)
+      if (e.detail?.followers || e.detail?.connections) {
+        setFollowersCount(e.detail.followers || e.detail.connections)
       }
     }
 
@@ -154,11 +155,11 @@ const Achievements = () => {
     window.addEventListener('certificates-synced', handleCertSync)
     window.addEventListener('linkedin-synced', handleLiSync)
 
-    // Automatically sync LinkedIn connections
+    // Automatically sync LinkedIn followers & network metrics
     syncLinkedInStats(true)
       .then((res) => {
-        if (res?.data?.connections) {
-          setConnectionsCount(res.data.connections)
+        if (res?.data?.followers || res?.data?.connections) {
+          setFollowersCount(res.data.followers || res.data.connections)
         }
       })
       .catch(() => {})
@@ -188,8 +189,8 @@ const Achievements = () => {
     if (achievement.isLinkedInCard) {
       return {
         ...achievement,
-        description: `Active professional network of ${connectionsCount} engineers, founders, and industry leaders sharing insights on DSA, scalable systems, and modern AI development.`,
-        year: `${connectionsCount} Connections`
+        description: `Active professional network of ${followersCount} followers and connections sharing insights on DSA, scalable systems, and modern AI development.`,
+        year: `${followersCount} Followers`
       }
     }
     return achievement

@@ -1,36 +1,10 @@
-import { motion } from 'framer-motion'
-import { useInView } from 'framer-motion'
-import { useRef } from 'react'
-
-import cBadge from '../assets/skills/c.svg'
-import cppBadge from '../assets/skills/cpp.svg'
-import jsBadge from '../assets/skills/javascript.svg'
-import javaBadge from '../assets/skills/java.svg'
-import vercelBadge from '../assets/skills/vercel.svg'
-import netlifyBadge from '../assets/skills/netlify.svg'
-import renderBadge from '../assets/skills/render.svg'
-import nodejsBadge from '../assets/skills/nodejs.svg'
-import mysqlBadge from '../assets/skills/mysql.svg'
-import mongodbBadge from '../assets/skills/mongodb.svg'
-import canvaBadge from '../assets/skills/canva.svg'
-import gitBadge from '../assets/skills/git.svg'
-import githubBadge from '../assets/skills/github.svg'
-
-const skillBadges = [
-  { name: 'C', src: cBadge },
-  { name: 'C++', src: cppBadge },
-  { name: 'JavaScript', src: jsBadge },
-  { name: 'Java', src: javaBadge },
-  { name: 'Vercel', src: vercelBadge },
-  { name: 'Netlify', src: netlifyBadge },
-  { name: 'Render', src: renderBadge },
-  { name: 'Node.js', src: nodejsBadge },
-  { name: 'MySQL', src: mysqlBadge },
-  { name: 'MongoDB', src: mongodbBadge },
-  { name: 'Canva', src: canvaBadge },
-  { name: 'Git', src: gitBadge },
-  { name: 'GitHub', src: githubBadge },
-]
+import { useState, useEffect, useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
+import {
+  defaultSkillBadges,
+  syncTechStackWithGitHub,
+  CACHE_KEY as TECH_STACK_CACHE_KEY
+} from '../lib/githubTechStackSync'
 
 const csSkills = [
   'DSA', 'OOPS', 'System Design', 'Computer Networks',
@@ -40,6 +14,46 @@ const csSkills = [
 const Experience = () => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
+  const [techBadges, setTechBadges] = useState(defaultSkillBadges)
+
+  useEffect(() => {
+    let isMounted = true
+
+    // 1. Hydrate from localStorage immediately
+    try {
+      const cached = localStorage.getItem(TECH_STACK_CACHE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached)
+        if (Array.isArray(parsed?.badges) && parsed.badges.length > 0) {
+          setTechBadges(parsed.badges)
+        }
+      }
+    } catch (e) {}
+
+    // 2. Listen for centralized background auto-sync updates
+    const handleSync = (e) => {
+      if (isMounted && Array.isArray(e.detail) && e.detail.length > 0) {
+        setTechBadges(e.detail)
+      }
+    }
+    window.addEventListener('tech-stack-synced', handleSync)
+
+    // 3. Automated live sync from GitHub Profile README
+    syncTechStackWithGitHub(true)
+      .then((res) => {
+        if (isMounted && res && Array.isArray(res.badges) && res.badges.length > 0) {
+          setTechBadges(res.badges)
+        }
+      })
+      .catch((err) => {
+        console.warn('Tech stack live sync notice:', err)
+      })
+
+    return () => {
+      isMounted = false
+      window.removeEventListener('tech-stack-synced', handleSync)
+    }
+  }, [])
 
   return (
     <section className="experience section-padding" id="experience">
@@ -92,9 +106,9 @@ const Experience = () => {
                 <span className="command">./list-technologies.sh --visual</span>
               </div>
               <div className="tech-badges-container">
-                {skillBadges.map((badge, index) => (
+                {techBadges.map((badge, index) => (
                   <motion.div
-                    key={badge.name}
+                    key={badge.name || badge.src || index}
                     className="tech-badge-item"
                     initial={{ opacity: 0, scale: 0.9, y: 10 }}
                     animate={isInView ? { opacity: 1, scale: 1, y: 0 } : {}}
@@ -102,8 +116,8 @@ const Experience = () => {
                     whileHover={{ scale: 1.08, y: -2 }}
                   >
                     <img
-                      src={badge.src}
-                      alt={badge.name}
+                      src={badge.src || badge.url}
+                      alt={badge.name || 'tech badge'}
                       className="tech-badge-img"
                       loading="lazy"
                     />

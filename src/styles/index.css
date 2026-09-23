@@ -4974,29 +4974,36 @@ button:focus-visible {
   box-shadow: 0 0 10px rgba(255, 55, 95, 0.4);
 }
 
-/* Topics Section */
-.leetcode-topics-section {
-  padding: 20px 24px;
+/* LeetCode Skills Category (Advanced, Intermediate, Fundamental) */
+.leetcode-skills-section {
+  padding: 22px 24px;
   border-top: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.15);
 }
 
-.leetcode-topics-header {
+.leetcode-skills-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.leetcode-topics-title {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--text-muted);
+.leetcode-skills-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.leetcode-topics-hint {
+.skills-main-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.leetcode-skills-hint {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   color: var(--accent);
@@ -5007,79 +5014,149 @@ button:focus-visible {
   letter-spacing: 0.01em;
 }
 
-.leetcode-topics-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.leetcode-skills-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.leetcode-skill-group {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
-@media (max-width: 480px) {
-  .leetcode-topics-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.leetcode-topic-pill {
+.leetcode-skill-group-title {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 0.82rem;
-  transition: all 0.2s ease;
+  gap: 9px;
 }
 
-.leetcode-topic-pill:hover {
-  border-color: var(--cyan);
-  background: rgba(0, 212, 255, 0.05);
+.skill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
-.topic-name {
-  color: var(--text-secondary);
+.dot-red {
+  background-color: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
 }
 
-.topic-count {
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
+.dot-yellow {
+  background-color: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+.dot-green {
+  background-color: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.skill-level-name {
+  font-size: 0.96rem;
   font-weight: 600;
-  color: var(--cyan);
-  background: var(--cyan-dim);
-  padding: 1px 6px;
-  border-radius: 4px;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
 }
 
-.leetcode-topics-toggle-container {
+.leetcode-skill-pills-row {
   display: flex;
-  justify-content: center;
-  margin-top: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
 }
 
-.leetcode-topics-toggle-btn {
+.leetcode-skill-item {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
+  gap: 6px;
+}
+
+.leetcode-skill-pill-name {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  color: #f1f5f9;
+  font-size: 0.82rem;
   font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   transition: all 0.2s ease;
 }
 
-.leetcode-topics-toggle-btn:hover {
-  background: rgba(0, 212, 255, 0.08);
-  border-color: var(--cyan);
-  color: var(--cyan);
+.leetcode-skill-pill-name:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-.leetcode-topics-toggle-btn .btn-icon {
-  font-size: 0.65rem;
+.leetcode-skill-multiplier {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #94a3b8;
+  letter-spacing: -0.01em;
+}
+
+.leetcode-skill-toggle-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.leetcode-skill-toggle-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.leetcode-skill-toggle-btn:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .leetcode-skills-section {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .skills-main-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .skill-level-name {
+  color: #0f172a;
+}
+
+[data-theme="light"] .leetcode-skill-pill-name {
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: #1e293b;
+}
+
+[data-theme="light"] .leetcode-skill-pill-name:hover {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .leetcode-skill-multiplier {
+  color: #64748b;
+}
+
+[data-theme="light"] .leetcode-skill-toggle-btn {
+  color: #64748b;
+}
+
+[data-theme="light"] .leetcode-skill-toggle-btn:hover {
+  color: #0f172a;
 }
 
 /* Repo Notice at bottom of card */

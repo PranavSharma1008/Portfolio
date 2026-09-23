@@ -15,6 +15,8 @@
 import { syncLeetCodeWithLiveSources } from './githubLeetcodeSync'
 import { syncWithGitHubRepo } from './githubCertSync'
 import { syncTypingWithGitHub } from './githubTypingSync'
+import { syncTechStackWithGitHub } from './githubTechStackSync'
+import { syncLinkedInStats } from './linkedinSync'
 import certificates from '../data/certificates'
 import typingAchievements from '../data/typingAchievements'
 
@@ -40,6 +42,16 @@ export const runAutoLiveSync = async (force = true) => {
       // 3. Fetch live typing records from GitHub repository
       syncTypingWithGitHub(typingAchievements, force).catch((err) => {
         console.warn('[AutoLiveSync] Typing records sync notice:', err?.message || err)
+      }),
+
+      // 4. Fetch live tech stack badges from GitHub profile README
+      syncTechStackWithGitHub(force).catch((err) => {
+        console.warn('[AutoLiveSync] Tech stack sync notice:', err?.message || err)
+      }),
+
+      // 5. Fetch live LinkedIn followers & network metrics
+      syncLinkedInStats(force).catch((err) => {
+        console.warn('[AutoLiveSync] LinkedIn sync notice:', err?.message || err)
       })
     ])
   } finally {

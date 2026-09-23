@@ -21,7 +21,7 @@ import {
   LEETCODE_BADGES_REPO_URL
 } from '../data/leetcodeData'
 
-export const CACHE_KEY = 'pranav_portfolio_leetcode_live_sync_v10'
+export const CACHE_KEY = 'pranav_portfolio_leetcode_live_sync_v11'
 export const CACHE_TTL_MS = 1000 * 60 * 5 // 5 minutes cache
 
 // Flush stale legacy cache keys from localStorage
@@ -36,7 +36,8 @@ if (typeof window !== 'undefined') {
       'pranav_portfolio_leetcode_live_sync_v6',
       'pranav_portfolio_leetcode_live_sync_v7',
       'pranav_portfolio_leetcode_live_sync_v8',
-      'pranav_portfolio_leetcode_live_sync_v9'
+      'pranav_portfolio_leetcode_live_sync_v9',
+      'pranav_portfolio_leetcode_live_sync_v10'
     ].forEach((k) => localStorage.removeItem(k))
   } catch (e) {}
 }
@@ -251,7 +252,21 @@ const parseGraphQLData = (user) => {
 
   // Live Skill/Topic stats from tagProblemCounts
   let liveTopics = null
+  let liveSkillsByLevel = null
   if (user.tagProblemCounts) {
+    const parseLevelTags = (tagList = []) => {
+      return (tagList || [])
+        .filter((t) => t && t.tagName && typeof t.problemsSolved === 'number' && t.problemsSolved > 0)
+        .map((t) => ({ name: t.tagName, count: t.problemsSolved }))
+        .sort((a, b) => b.count - a.count)
+    }
+
+    liveSkillsByLevel = {
+      advanced: parseLevelTags(user.tagProblemCounts.advanced),
+      intermediate: parseLevelTags(user.tagProblemCounts.intermediate),
+      fundamental: parseLevelTags(user.tagProblemCounts.fundamental)
+    }
+
     const allTags = [
       ...(user.tagProblemCounts.fundamental || []),
       ...(user.tagProblemCounts.intermediate || []),
@@ -293,7 +308,8 @@ const parseGraphQLData = (user) => {
     ranking,
     acceptanceRate,
     ...(liveBadges ? { liveBadges } : {}),
-    ...(liveTopics ? { topics: liveTopics } : {})
+    ...(liveTopics ? { topics: liveTopics } : {}),
+    ...(liveSkillsByLevel ? { skillsByLevel: liveSkillsByLevel } : {})
   }
 }
 
@@ -594,6 +610,7 @@ export const syncLeetCodeWithLiveSources = async (forceRefresh = false) => {
     realName: liveStats?.realName || liveStats?.name || leetcodeInitialData.realName,
     name: liveStats?.name || liveStats?.realName || leetcodeInitialData.name,
     badges: mergedBadges,
+    skillsByLevel: liveStats?.skillsByLevel || leetcodeInitialData.skillsByLevel,
     topics: (liveStats?.topics && Array.isArray(liveStats.topics) && liveStats.topics.length > 0)
       ? liveStats.topics
       : leetcodeInitialData.topics,

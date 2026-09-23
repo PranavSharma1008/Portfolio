@@ -11,7 +11,8 @@ import {
 
 const CertificatesGallery = ({ initialExpanded = false }) => {
   const [allCertificates, setAllCertificates] = useState(certificates)
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [activeCategory, setActiveCategory] = useState('Hackathons')
+  const [hasUserSelectedCategory, setHasUserSelectedCategory] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isExpanded, setIsExpanded] = useState(initialExpanded)
   const [selectedCertIndex, setSelectedCertIndex] = useState(null)
@@ -55,23 +56,39 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     }
   }, [])
 
-  // Category counts
+  // Instantly purge any broken or deleted live certificate
+  const handleRemoveBrokenCert = (certId) => {
+    setAllCertificates((prev) => {
+      const updated = prev.filter((c) => c.id !== certId)
+      try {
+        const cached = localStorage.getItem(CACHE_KEY)
+        if (cached) {
+          const parsed = JSON.parse(cached)
+          parsed.certificates = updated
+          localStorage.setItem(CACHE_KEY, JSON.stringify(parsed))
+        }
+      } catch (e) {}
+      return updated
+    })
+  }
+
+  // Category counts (individual category breakdown without "All")
   const categoryCounts = useMemo(() => {
-    const counts = { All: allCertificates.length }
+    const counts = {}
     allCertificates.forEach((c) => {
       counts[c.category] = (counts[c.category] || 0) + 1
     })
     return counts
   }, [allCertificates])
 
-  // Dynamic available categories: "All" first, "Hackathons" second, followed by base + auto-detected topics
+  // Dynamic available categories: "Hackathons" first, followed by base + auto-detected topics (without "All")
   const availableCategories = useMemo(() => {
-    const baseList = ['All', 'Hackathons']
+    const baseList = ['Hackathons']
     const seen = new Set(baseList)
     const list = [...baseList]
 
     CERTIFICATE_CATEGORIES.forEach((cat) => {
-      if (!seen.has(cat)) {
+      if (cat !== 'All' && !seen.has(cat)) {
         seen.add(cat)
         list.push(cat)
       }
@@ -80,7 +97,7 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     allCertificates.forEach((c) => {
       if (c && c.category && typeof c.category === 'string') {
         const cat = c.category.trim()
-        if (cat && !seen.has(cat)) {
+        if (cat && cat !== 'All' && !seen.has(cat)) {
           seen.add(cat)
           list.push(cat)
         }
@@ -90,11 +107,13 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     return list
   }, [allCertificates])
 
+  // Keep default active category locked on "Hackathons" by default (even with 0 certs).
+  // Once the user uploads new certificates to GitHub, auto-sync dynamically adds and displays them here.
+
   // Filtered certificates
   const filteredCertificates = useMemo(() => {
     const list = allCertificates.filter((cert) => {
-      const matchesCategory =
-        activeCategory === 'All' || cert.category === activeCategory
+      const matchesCategory = cert.category === activeCategory
       const query = searchQuery.trim().toLowerCase()
       if (!query) return matchesCategory
 
@@ -128,13 +147,10 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     })
   }, [allCertificates, activeCategory, searchQuery])
 
-  // Paginated/Display slice (if collapsed, show first 12; if expanded or searching, show all)
+  // Displayed certificates
   const displayedCertificates = useMemo(() => {
-    if (isExpanded || searchQuery.trim().length > 0 || activeCategory !== 'All') {
-      return filteredCertificates
-    }
-    return filteredCertificates.slice(0, 12)
-  }, [filteredCertificates, isExpanded, searchQuery, activeCategory])
+    return filteredCertificates
+  }, [filteredCertificates])
 
   const handleOpenModal = (indexInFiltered) => {
     setSelectedCertIndex(indexInFiltered)
@@ -250,7 +266,10 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
               key={cat}
               type="button"
               className={`cert-filter-pill ${isActive ? 'active' : ''}`}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => {
+                setHasUserSelectedCategory(true)
+                setActiveCategory(cat)
+              }}
             >
               <span className="pill-content">
                 <span className="pill-name">{cat}</span>
@@ -317,6 +336,11 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
                       alt={cert.title}
                       className="cert-card-img"
                       loading="lazy"
+                      onError={() => {
+                        if (cert.isLiveGithub) {
+                          handleRemoveBrokenCert(cert.id)
+                        }
+                      }}
                     />
                   ) : (
                     <div className="cert-pdf-placeholder">
@@ -402,44 +426,41 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
         </motion.div>
       ) : (
         <div className="certs-empty-state">
-          <div className="empty-icon">📂</div>
+          <div className="empty-icon">{activeCategory === 'Hackathons' ? '🏆' : '📂'}</div>
           <p>
             {searchQuery
-              ? `No certificates found matching "${searchQuery}"`
-              : activeCategory !== 'All'
-              ? `No certificates found in ${activeCategory}`
-              : 'No certificates found'}
+              ? `No certificates found matching "${searchQuery}" in ${activeCategory}`
+              : activeCategory === 'Hackathons'
+              ? 'No hackathon certificates found in repository currently. Newly added certificates on GitHub will sync automatically here.'
+              : `No certificates found in ${activeCategory}`}
           </p>
+          {activeCategory === 'Hackathons' && !searchQuery && (
+            <a
+              href={GITHUB_HACK_REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cmd-btn"
+              style={{ marginTop: '10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <span>View GitHub Hack-Certficates Repo ↗</span>
+            </a>
+          )}
           <button
             type="button"
             className="cmd-btn"
+            style={{ marginTop: activeCategory === 'Hackathons' && !searchQuery ? '8px' : '0' }}
             onClick={() => {
               setSearchQuery('')
-              setActiveCategory('All')
+              const fallback =
+                availableCategories.find((cat) => (categoryCounts[cat] || 0) > 0 && cat !== activeCategory) ||
+                availableCategories[1] ||
+                availableCategories[0]
+              setHasUserSelectedCategory(true)
+              setActiveCategory(fallback)
             }}
           >
-            {activeCategory !== 'All' || searchQuery ? 'View All Certificates' : 'Reset Filters'}
+            {searchQuery ? 'Clear Search' : 'Explore Other Categories'}
           </button>
-        </div>
-      )}
-
-      {/* Expand / Show All Toggle Button */}
-      {activeCategory === 'All' && !searchQuery && allCertificates.length > 12 && (
-        <div className="certs-expand-wrapper">
-          <motion.button
-            type="button"
-            className="cmd-btn cmd-btn-primary certs-toggle-expand-btn"
-            onClick={() => setIsExpanded(!isExpanded)}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <span className="btn-icon">{isExpanded ? '▲' : '▼'}</span>
-            <span>
-              {isExpanded
-                ? 'Collapse Certificates Gallery'
-                : `View All ${allCertificates.length} Certificates (${allCertificates.length - 12} more)`}
-            </span>
-          </motion.button>
         </div>
       )}
 

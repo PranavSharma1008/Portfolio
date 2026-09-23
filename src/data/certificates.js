@@ -1,7 +1,6 @@
 // 42 Verified Certificates - Prioritized by Technical Relevance
 
 export const CERTIFICATE_CATEGORIES = [
-  'All',
   'Hackathons',
   'AI & Prompting',
   'Python & ML',
