@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import CertificatesGallery from './CertificatesGallery'
+import SihModal from './SihModal'
 import certificates from '../data/certificates'
 import { leetcodeInitialData } from '../data/leetcodeData'
 import { CACHE_KEY } from '../lib/githubLeetcodeSync'
@@ -48,14 +49,34 @@ const checkBadgeIcon = (
   </svg>
 )
 
+const sihBadgeIcon = (
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ff9800" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z" />
+    <path d="M9 21h6" />
+    <path d="M10 17h4" />
+    <circle cx="12" cy="9" r="1.5" fill="#ff9800" />
+  </svg>
+)
+
 const iconMap = {
   github: githubIcon,
   leetcode: leetcodeIcon,
   monkeytype: monkeyTypeIcon,
-  linkedin: linkedinIcon
+  linkedin: linkedinIcon,
+  sih: sihBadgeIcon
 }
 
 const achievements = [
+  {
+    title: 'Smart India Hackathon 2026',
+    description: 'Selected at College Level (Chitkara University) for SIH 2026. Developing SehatSetu – RuralCare Connect for PS ID SIH26133 under MedTech/BioTech/HealthTech theme.',
+    year: 'Chitkara Selected',
+    badgeIcon: sihBadgeIcon,
+    isSihCard: true,
+    links: [
+      { url: 'https://www.sih.gov.in/', type: 'sih', title: 'Smart India Hackathon Portal' }
+    ]
+  },
   {
     title: 'Professional Typer',
     description: 'Achieved 82 WPM peak sprint and 100% accuracy. Documented milestones on Monkeytype.',
@@ -109,6 +130,7 @@ const Achievements = () => {
   const [solvedCount, setSolvedCount] = useState(leetcodeInitialData.totalSolved)
   const [certsCount, setCertsCount] = useState(certificates.length)
   const [followersCount, setFollowersCount] = useState(DEFAULT_FOLLOWERS)
+  const [sihModalOpen, setSihModalOpen] = useState(false)
 
   useEffect(() => {
     try {
@@ -252,6 +274,16 @@ const Achievements = () => {
               
               <div className="achievement-meta-row">
                 <span className="achievement-date">{achievement.year}</span>
+                {achievement.isSihCard && (
+                  <button
+                    type="button"
+                    onClick={() => setSihModalOpen(true)}
+                    className="ach-jump-certs-btn ach-jump-sih-btn"
+                    title="View SIH 2026 Selection Details & Certificate"
+                  >
+                    View Certificate / Proof ↗
+                  </button>
+                )}
                 {achievement.isCertCard && (
                   <button
                     type="button"
@@ -310,6 +342,12 @@ const Achievements = () => {
 
         {/* Full 42 Certificates Interactive Showcase */}
         <CertificatesGallery />
+
+        {/* Smart India Hackathon 2026 Selection & Certificate Modal */}
+        <SihModal
+          isOpen={sihModalOpen}
+          onClose={() => setSihModalOpen(false)}
+        />
       </div>
     </section>
   )

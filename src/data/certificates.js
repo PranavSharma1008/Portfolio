@@ -12,6 +12,27 @@ export const CERTIFICATE_CATEGORIES = [
 
 export const certificates = [
   {
+    "id": "cert-sih-2026",
+    "title": "Smart India Hackathon 2026 — College Level Selection",
+    "issuer": "Smart India Hackathon (Chitkara University)",
+    "category": "Hackathons",
+    "date": "Sep 2026",
+    "credentialId": "SIH26133",
+    "verifyUrl": "https://www.sih.gov.in/",
+    "fileUrl": "/certificates/sih-2026-title.png",
+    "thumbnailUrl": "/certificates/sih-2026-title.png",
+    "type": "image",
+    "fileName": "sih-2026-chitkara-selection.png",
+    "badge": {
+      "name": "SIH 2026",
+      "color": "#FF9800"
+    },
+    "isHackathon": true,
+    "isSpecialization": false,
+    "priority": 120,
+    "status": "Selected at College / Chitkara Level"
+  },
+  {
     "id": "cert-02",
     "title": "Google Prompting Essentials Specialization",
     "issuer": "Google",
