@@ -11,7 +11,7 @@ import {
 
 const CertificatesGallery = ({ initialExpanded = false }) => {
   const [allCertificates, setAllCertificates] = useState(certificates)
-  const [activeCategory, setActiveCategory] = useState('Hackathons')
+  const [activeCategory, setActiveCategory] = useState('All')
   const [hasUserSelectedCategory, setHasUserSelectedCategory] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isExpanded, setIsExpanded] = useState(initialExpanded)
@@ -72,23 +72,23 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     })
   }
 
-  // Category counts (individual category breakdown without "All")
+  // Category counts
   const categoryCounts = useMemo(() => {
-    const counts = {}
+    const counts = { All: allCertificates.length }
     allCertificates.forEach((c) => {
       counts[c.category] = (counts[c.category] || 0) + 1
     })
     return counts
   }, [allCertificates])
 
-  // Dynamic available categories: "Hackathons" first, followed by base + auto-detected topics (without "All")
+  // Dynamic available categories: "All" first, then "Hackathons", then other categories
   const availableCategories = useMemo(() => {
-    const baseList = ['Hackathons']
+    const baseList = ['All', 'Hackathons']
     const seen = new Set(baseList)
     const list = [...baseList]
 
     CERTIFICATE_CATEGORIES.forEach((cat) => {
-      if (cat !== 'All' && !seen.has(cat)) {
+      if (!seen.has(cat)) {
         seen.add(cat)
         list.push(cat)
       }
@@ -97,7 +97,7 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     allCertificates.forEach((c) => {
       if (c && c.category && typeof c.category === 'string') {
         const cat = c.category.trim()
-        if (cat && cat !== 'All' && !seen.has(cat)) {
+        if (!seen.has(cat)) {
           seen.add(cat)
           list.push(cat)
         }
@@ -107,13 +107,11 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     return list
   }, [allCertificates])
 
-  // Keep default active category locked on "Hackathons" by default (even with 0 certs).
-  // Once the user uploads new certificates to GitHub, auto-sync dynamically adds and displays them here.
-
   // Filtered certificates
   const filteredCertificates = useMemo(() => {
     const list = allCertificates.filter((cert) => {
-      const matchesCategory = cert.category === activeCategory
+      const matchesCategory =
+        activeCategory === 'All' || cert.category === activeCategory
       const query = searchQuery.trim().toLowerCase()
       if (!query) return matchesCategory
 
@@ -451,15 +449,10 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
             style={{ marginTop: activeCategory === 'Hackathons' && !searchQuery ? '8px' : '0' }}
             onClick={() => {
               setSearchQuery('')
-              const fallback =
-                availableCategories.find((cat) => (categoryCounts[cat] || 0) > 0 && cat !== activeCategory) ||
-                availableCategories[1] ||
-                availableCategories[0]
-              setHasUserSelectedCategory(true)
-              setActiveCategory(fallback)
+              setActiveCategory('All')
             }}
           >
-            {searchQuery ? 'Clear Search' : 'Explore Other Categories'}
+            {searchQuery ? 'Clear Search' : 'View All Certificates'}
           </button>
         </div>
       )}
