@@ -43,7 +43,7 @@ const Hero = () => {
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
           <TypingText as="p" className="hero-greeting" delay={0.15} duration={0.45}>
-            Hello, World!
+            Welcome to my portfolio
           </TypingText>
 
           <TypingText as="h1" className="hero-name" delay={0.4} duration={0.8}>
