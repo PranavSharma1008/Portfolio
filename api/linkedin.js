@@ -15,6 +15,24 @@ export default async function handler(req, res) {
   let connections = '850+'
 
   try {
+    // 0. Try fetching automated repository sync data
+    try {
+      const dataController = new AbortController()
+      const dataTimer = setTimeout(() => dataController.abort(), 2500)
+      const dataRes = await fetch(
+        `https://raw.githubusercontent.com/PranavSharma1008/Portfolio/main/public/data/linkedin.json?_t=${Date.now()}`,
+        { signal: dataController.signal, cache: 'no-store' }
+      )
+      clearTimeout(dataTimer)
+      if (dataRes.ok) {
+        const jsonData = await dataRes.json()
+        if (jsonData?.followers) {
+          followers = String(jsonData.followers).replace(/[^0-9]/g, '')
+          connections = jsonData.connections || `${followers}+`
+        }
+      }
+    } catch (e) {}
+
     // 1. Try checking GitHub Profile README for any live followers badge or metric
     try {
       const ghController = new AbortController()

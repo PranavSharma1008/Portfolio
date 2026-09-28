@@ -1,0 +1,46 @@
+name: Sync LinkedIn Followers
+
+on:
+  schedule:
+    # Run once every 24 hours at 00:00 UTC (5:30 AM IST)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI anytime
+  push:
+    paths:
+      - 'scripts/sync-linkedin.js'
+      - '.github/workflows/sync-linkedin.yml'
+
+jobs:
+  sync-linkedin:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Allows committing the updated follower count
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Sync LinkedIn Follower Count
+        env:
+          LINKEDIN_LI_AT: ${{ secrets.LINKEDIN_LI_AT }}
+        run: |
+          node scripts/sync-linkedin.js
+
+      - name: Commit and Push if followers changed
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          if [ -n "$(git status --porcelain public/data/linkedin.json)" ]; then
+            git add public/data/linkedin.json
+            git commit -m "🤖 Auto-sync LinkedIn follower count [skip ci]"
+            git push origin main
+            echo "Successfully updated LinkedIn followers count in public/data/linkedin.json"
+          else
+            echo "No change in LinkedIn followers count detected. Repository is up-to-date."
+          fi

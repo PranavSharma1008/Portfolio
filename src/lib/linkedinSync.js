@@ -129,8 +129,10 @@ export const syncLinkedInStats = async (forceRefresh = false) => {
 
   let liveData = null
 
-  // 2A. Multi-tier live fetching via serverless proxies
+  // 2A. Multi-tier live fetching via static synced data & serverless proxies
   const endpoints = [
+    `/data/linkedin.json${forceRefresh ? `?_t=${Date.now()}` : ''}`,
+    `https://raw.githubusercontent.com/PranavSharma1008/Portfolio/main/public/data/linkedin.json${forceRefresh ? `?_t=${Date.now()}` : ''}`,
     `/api/linkedin${forceRefresh ? `?_t=${Date.now()}` : ''}`,
     `/.netlify/functions/linkedin${forceRefresh ? `?_t=${Date.now()}` : ''}`
   ]
