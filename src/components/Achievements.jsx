@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import CertificatesGallery from './CertificatesGallery'
-import Code2ChillModal from './Code2ChillModal'
 import certificates from '../data/certificates'
 import { leetcodeInitialData } from '../data/leetcodeData'
 import { CACHE_KEY } from '../lib/githubLeetcodeSync'
@@ -91,7 +90,11 @@ const achievements = [
     badgeIcon: c2cBadgeIcon,
     isC2cCard: true,
     links: [
-      { url: 'https://www.linkedin.com/in/pranavsharma1008/', type: 'linkedin', title: 'LinkedIn Post & Proof' }
+      {
+        url: 'https://www.linkedin.com/posts/pranavsharma1008_code2chill-leetcode-dsa-activity-7508624331850190848-1Ec-?utm_source=share&utm_medium=member_desktop&rcm=ACoAAGFVk6UB0Qprql3hceLxNFaKPofWdsr-mm4',
+        type: 'linkedin',
+        title: 'View Code2Chill LeetCode Competition Post on LinkedIn'
+      }
     ]
   },
   {
@@ -147,7 +150,6 @@ const Achievements = () => {
   const [solvedCount, setSolvedCount] = useState(leetcodeInitialData.totalSolved)
   const [certsCount, setCertsCount] = useState(certificates.length)
   const [followersCount, setFollowersCount] = useState(DEFAULT_FOLLOWERS)
-  const [c2cModalOpen, setC2cModalOpen] = useState(false)
 
   useEffect(() => {
     try {
@@ -291,16 +293,6 @@ const Achievements = () => {
               
               <div className="achievement-meta-row">
                 <span className="achievement-date">{achievement.year}</span>
-                {achievement.isC2cCard && (
-                  <button
-                    type="button"
-                    onClick={() => setC2cModalOpen(true)}
-                    className="ach-jump-certs-btn ach-jump-c2c-btn"
-                    title="View Code2Chill LeetCode Competition Details & Proof"
-                  >
-                    View Event / Proof ↗
-                  </button>
-                )}
                 {achievement.isCertCard && (
                   <button
                     type="button"
@@ -348,12 +340,6 @@ const Achievements = () => {
 
         {/* Full 42 Certificates Interactive Showcase */}
         <CertificatesGallery />
-
-        {/* Code2Chill On Fire LeetCode Competition Modal */}
-        <Code2ChillModal
-          isOpen={c2cModalOpen}
-          onClose={() => setC2cModalOpen(false)}
-        />
       </div>
     </section>
   )
