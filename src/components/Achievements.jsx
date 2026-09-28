@@ -98,17 +98,6 @@ const achievements = [
     ]
   },
   {
-    title: 'Professional Typer',
-    description: 'Achieved 82 WPM peak sprint and 100% accuracy. Documented milestones on Monkeytype.',
-    year: '14 Records',
-    badgeIcon: checkBadgeIcon,
-    isTypingCard: true,
-    links: [
-      { url: 'https://github.com/PranavSharma1008/TypingAchivenments', type: 'github' },
-      { url: 'https://monkeytype.com/profile/SharmaPranav1008', type: 'monkeytype' }
-    ]
-  },
-  {
     title: 'DSA Mastery',
     description: 'Solved 277 algorithm problems covering dynamic programming, graphs, trees, and system logic with 100-Day consistency badges.',
     year: '277 Solved',
@@ -117,6 +106,17 @@ const achievements = [
     links: [
       { url: 'https://leetcode.com/u/SharmaPranav1008/', type: 'leetcode' },
       { url: 'https://github.com/PranavSharma1008/LeetcodeSerieGithub', type: 'github' }
+    ]
+  },
+  {
+    title: 'Professional Typer',
+    description: 'Achieved 82 WPM peak sprint and 100% accuracy. Documented milestones on Monkeytype.',
+    year: '14 Records',
+    badgeIcon: checkBadgeIcon,
+    isTypingCard: true,
+    links: [
+      { url: 'https://github.com/PranavSharma1008/TypingAchivenments', type: 'github' },
+      { url: 'https://monkeytype.com/profile/SharmaPranav1008', type: 'monkeytype' }
     ]
   },
   {
