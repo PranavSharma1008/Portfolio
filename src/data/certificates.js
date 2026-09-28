@@ -33,6 +33,27 @@ export const certificates = [
     "status": "Selected at College / Chitkara Level"
   },
   {
+    "id": "cert-code2chill-2026",
+    "title": "Code2Chill: (O)n Fire — LeetCode Competition (Top 20 Finalist)",
+    "issuer": "Code2Chill Club (Chitkara University)",
+    "category": "Hackathons",
+    "date": "Sep 2026",
+    "credentialId": "C2C-TOP20",
+    "verifyUrl": "https://www.linkedin.com/in/pranavsharma1008/",
+    "fileUrl": "/certificates/code2chill-proof.png",
+    "thumbnailUrl": "/certificates/code2chill-poster.png",
+    "type": "image",
+    "fileName": "code2chill-onfire-top20.png",
+    "badge": {
+      "name": "Code2Chill",
+      "color": "#FF5722"
+    },
+    "isHackathon": true,
+    "isSpecialization": false,
+    "priority": 115,
+    "status": "Top 20 Finalist (Out of 300+ Participants)"
+  },
+  {
     "id": "cert-02",
     "title": "Google Prompting Essentials Specialization",
     "issuer": "Google",

@@ -3408,6 +3408,91 @@ button:focus-visible {
   font-size: 1.2rem;
 }
 
+.ach-jump-c2c-btn {
+  color: #ff5722;
+  background: rgba(255, 87, 34, 0.14);
+  border: 1px solid rgba(255, 87, 34, 0.4);
+  cursor: pointer;
+}
+
+.ach-jump-c2c-btn:hover {
+  background: rgba(255, 87, 34, 0.28);
+  border-color: #ff5722;
+  color: #ffffff;
+}
+
+.c2c-pill {
+  background: rgba(255, 87, 34, 0.2) !important;
+  color: #ff5722 !important;
+  border: 1px solid rgba(255, 87, 34, 0.5) !important;
+}
+
+.c2c-banner {
+  background: linear-gradient(135deg, rgba(255, 87, 34, 0.14), rgba(234, 88, 12, 0.08));
+  border-bottom: 1px solid rgba(255, 87, 34, 0.25);
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.c2c-banner-badge {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ff5722;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.c2c-banner-sub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.c2c-stat-chips {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.c2c-chip {
+  flex: 1;
+  min-width: 110px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.c2c-chip.highlight {
+  border-color: rgba(255, 87, 34, 0.5);
+  background: rgba(255, 87, 34, 0.1);
+}
+
+.c2c-chip-num {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.c2c-chip.highlight .c2c-chip-num {
+  color: #ff5722;
+}
+
+.c2c-chip-lbl {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .certificates-showcase-container {
   margin-top: 56px;
   padding-top: 48px;

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import CertificatesGallery from './CertificatesGallery'
 import SihModal from './SihModal'
+import Code2ChillModal from './Code2ChillModal'
 import certificates from '../data/certificates'
 import { leetcodeInitialData } from '../data/leetcodeData'
 import { CACHE_KEY } from '../lib/githubLeetcodeSync'
@@ -58,12 +59,19 @@ const sihBadgeIcon = (
   </svg>
 )
 
+const c2cBadgeIcon = (
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ff5722" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </svg>
+)
+
 const iconMap = {
   github: githubIcon,
   leetcode: leetcodeIcon,
   monkeytype: monkeyTypeIcon,
   linkedin: linkedinIcon,
-  sih: sihBadgeIcon
+  sih: sihBadgeIcon,
+  c2c: c2cBadgeIcon
 }
 
 const achievements = [
@@ -75,6 +83,16 @@ const achievements = [
     isSihCard: true,
     links: [
       { url: 'https://www.sih.gov.in/', type: 'sih', title: 'Smart India Hackathon Portal' }
+    ]
+  },
+  {
+    title: 'Code2Chill: On Fire (LeetCode)',
+    description: 'Top 20 Finalist out of 300+ participants in Chitkara University\'s official LeetCode competition, qualifying through Easy & Medium problem rounds into Hard finals.',
+    year: 'Top 20 / 300+',
+    badgeIcon: c2cBadgeIcon,
+    isC2cCard: true,
+    links: [
+      { url: 'https://www.linkedin.com/in/pranavsharma1008/', type: 'linkedin', title: 'LinkedIn Post & Proof' }
     ]
   },
   {
@@ -131,6 +149,7 @@ const Achievements = () => {
   const [certsCount, setCertsCount] = useState(certificates.length)
   const [followersCount, setFollowersCount] = useState(DEFAULT_FOLLOWERS)
   const [sihModalOpen, setSihModalOpen] = useState(false)
+  const [c2cModalOpen, setC2cModalOpen] = useState(false)
 
   useEffect(() => {
     try {
@@ -284,6 +303,16 @@ const Achievements = () => {
                     View Certificate / Proof ↗
                   </button>
                 )}
+                {achievement.isC2cCard && (
+                  <button
+                    type="button"
+                    onClick={() => setC2cModalOpen(true)}
+                    className="ach-jump-certs-btn ach-jump-c2c-btn"
+                    title="View Code2Chill LeetCode Competition Details & Proof"
+                  >
+                    View Event / Proof ↗
+                  </button>
+                )}
                 {achievement.isCertCard && (
                   <button
                     type="button"
@@ -314,17 +343,6 @@ const Achievements = () => {
                     Explore LeetCode Stats ↓
                   </button>
                 )}
-                {achievement.isLinkedInCard && (
-                  <a
-                    href={LINKEDIN_PROFILE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ach-jump-certs-btn ach-jump-linkedin-btn"
-                    title="Open LinkedIn Profile (@pranavsharma1008)"
-                  >
-                    View LinkedIn Profile ↗
-                  </a>
-                )}
               </div>
 
               {achievement.links && (
@@ -347,6 +365,12 @@ const Achievements = () => {
         <SihModal
           isOpen={sihModalOpen}
           onClose={() => setSihModalOpen(false)}
+        />
+
+        {/* Code2Chill On Fire LeetCode Competition Modal */}
+        <Code2ChillModal
+          isOpen={c2cModalOpen}
+          onClose={() => setC2cModalOpen(false)}
         />
       </div>
     </section>
