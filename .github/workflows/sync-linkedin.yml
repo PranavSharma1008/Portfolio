@@ -36,11 +36,11 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          if [ -n "$(git status --porcelain public/data/linkedin.json)" ]; then
-            git add public/data/linkedin.json
+          if [ -n "$(git status --porcelain public/data/linkedin.json src/data/linkedinData.json)" ]; then
+            git add public/data/linkedin.json src/data/linkedinData.json
             git commit -m "🤖 Auto-sync LinkedIn follower count [skip ci]"
             git push origin main
-            echo "Successfully updated LinkedIn followers count in public/data/linkedin.json"
+            echo "Successfully updated LinkedIn followers count"
           else
             echo "No change in LinkedIn followers count detected. Repository is up-to-date."
           fi

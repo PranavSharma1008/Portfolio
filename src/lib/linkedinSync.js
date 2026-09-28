@@ -8,12 +8,14 @@
  * operating on the exact same multi-tiered auto-sync architecture as LeetCode and GitHub.
  */
 
-export const LINKEDIN_PROFILE_URL = 'https://www.linkedin.com/in/pranavsharma1008/'
-export const LINKEDIN_USERNAME = 'pranavsharma1008'
-export const DEFAULT_FOLLOWERS = '805'
-export const DEFAULT_CONNECTIONS = '805+'
+import linkedinData from '../data/linkedinData.json'
 
-export const CACHE_KEY = 'pranav_portfolio_linkedin_sync_v3'
+export const LINKEDIN_PROFILE_URL = linkedinData.profileUrl || 'https://www.linkedin.com/in/pranavsharma1008/'
+export const LINKEDIN_USERNAME = linkedinData.username || 'pranavsharma1008'
+export const DEFAULT_FOLLOWERS = String(linkedinData.followers || '850')
+export const DEFAULT_CONNECTIONS = linkedinData.connections || `${DEFAULT_FOLLOWERS}+`
+
+export const CACHE_KEY = 'pranav_portfolio_linkedin_sync_v4'
 export const CACHE_TTL_MS = 1000 * 60 * 15 // 15 minutes cache
 
 // Flush stale legacy cache keys from localStorage
@@ -21,7 +23,8 @@ if (typeof window !== 'undefined') {
   try {
     [
       'pranav_portfolio_linkedin_sync_v1',
-      'pranav_portfolio_linkedin_sync_v2'
+      'pranav_portfolio_linkedin_sync_v2',
+      'pranav_portfolio_linkedin_sync_v3'
     ].forEach((k) => localStorage.removeItem(k))
   } catch (e) {}
 }

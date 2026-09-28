@@ -9,7 +9,9 @@ const __dirname = path.dirname(__filename)
 
 const USERNAME = 'pranavsharma1008'
 const PROFILE_URL = `https://www.linkedin.com/in/${USERNAME}/`
-const DATA_FILE_PATH = path.resolve(__dirname, '../public/data/linkedin.json')
+const PUBLIC_DATA_PATH = path.resolve(__dirname, '../public/data/linkedin.json')
+const SRC_DATA_PATH = path.resolve(__dirname, '../src/data/linkedinData.json')
+const DATA_FILE_PATH = PUBLIC_DATA_PATH
 
 // Helper to sanitize extracted number string
 function sanitizeCount(raw) {
@@ -203,9 +205,12 @@ async function main() {
       isLive: true
     }
 
-    fs.mkdirSync(path.dirname(DATA_FILE_PATH), { recursive: true })
-    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(updatedData, null, 2) + '\n', 'utf-8')
-    console.log(`[LinkedIn Sync] ✅ Successfully updated ${DATA_FILE_PATH}`)
+    const jsonStr = JSON.stringify(updatedData, null, 2) + '\n'
+    fs.mkdirSync(path.dirname(PUBLIC_DATA_PATH), { recursive: true })
+    fs.writeFileSync(PUBLIC_DATA_PATH, jsonStr, 'utf-8')
+    fs.mkdirSync(path.dirname(SRC_DATA_PATH), { recursive: true })
+    fs.writeFileSync(SRC_DATA_PATH, jsonStr, 'utf-8')
+    console.log(`[LinkedIn Sync] ✅ Successfully updated ${PUBLIC_DATA_PATH} & ${SRC_DATA_PATH}`)
     console.log(JSON.stringify(updatedData, null, 2))
   } else {
     console.log(`[LinkedIn Sync] Retaining existing count: ${existingData.followers}`)
@@ -213,8 +218,11 @@ async function main() {
       ...existingData,
       updatedAt: new Date().toISOString()
     }
-    fs.mkdirSync(path.dirname(DATA_FILE_PATH), { recursive: true })
-    fs.writeFileSync(DATA_FILE_PATH, JSON.stringify(updatedData, null, 2) + '\n', 'utf-8')
+    const jsonStr = JSON.stringify(updatedData, null, 2) + '\n'
+    fs.mkdirSync(path.dirname(PUBLIC_DATA_PATH), { recursive: true })
+    fs.writeFileSync(PUBLIC_DATA_PATH, jsonStr, 'utf-8')
+    fs.mkdirSync(path.dirname(SRC_DATA_PATH), { recursive: true })
+    fs.writeFileSync(SRC_DATA_PATH, jsonStr, 'utf-8')
     console.log('[LinkedIn Sync] Done.')
   }
 }

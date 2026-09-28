@@ -107,9 +107,9 @@ export default async function handler(req, res) {
     return res.status(200).json({
       username,
       profileUrl,
-      connections: '805+',
-      followers: '805',
-      displayFollowers: '805 Followers',
+      connections: '850+',
+      followers: '850',
+      displayFollowers: '850 Followers',
       updatedAt: new Date().toISOString()
     })
   }
