@@ -11,8 +11,8 @@ export default async function handler(req, res) {
 
   const username = 'pranavsharma1008'
   const profileUrl = `https://www.linkedin.com/in/${username}/`
-  let followers = '805'
-  let connections = '805+'
+  let followers = '850'
+  let connections = '850+'
 
   try {
     // 1. Try checking GitHub Profile README for any live followers badge or metric
