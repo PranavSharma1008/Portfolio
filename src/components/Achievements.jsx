@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import CertificatesGallery from './CertificatesGallery'
 import certificates from '../data/certificates'
 import { leetcodeInitialData } from '../data/leetcodeData'
@@ -146,10 +146,13 @@ const achievements = [
   }
 ]
 
+const INITIAL_ACHIEVEMENTS_COUNT = 3
+
 const Achievements = () => {
   const [solvedCount, setSolvedCount] = useState(leetcodeInitialData.totalSolved)
   const [certsCount, setCertsCount] = useState(certificates.length)
   const [followersCount, setFollowersCount] = useState(DEFAULT_FOLLOWERS)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
     try {
@@ -237,6 +240,22 @@ const Achievements = () => {
     return achievement
   })
 
+  const visibleAchievements = isExpanded
+    ? displayAchievements
+    : displayAchievements.slice(0, INITIAL_ACHIEVEMENTS_COUNT)
+
+  const handleToggleExpand = () => {
+    if (isExpanded) {
+      setIsExpanded(false)
+      const el = document.getElementById('achievements')
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    } else {
+      setIsExpanded(true)
+    }
+  }
+
   const scrollToLeetcode = (e) => {
     e.preventDefault()
     const el = document.getElementById('leetcode')
@@ -274,69 +293,93 @@ const Achievements = () => {
           Achievements
         </motion.h2>
 
-        <div className="achievements-grid">
-          {displayAchievements.map((achievement, index) => (
-            <motion.article
-              key={index}
-              className={`achievement-card ${achievement.isCertCard ? 'achievement-card-certs' : ''}`}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -4, boxShadow: '0 0 30px rgba(0, 212, 255, 0.12)' }}
-            >
-              <div className="achievement-badge">
-                {achievement.badgeIcon || checkBadgeIcon}
-              </div>
-              <h3 className="achievement-title">{achievement.title}</h3>
-              <p className="achievement-description">{achievement.description}</p>
-              
-              <div className="achievement-meta-row">
-                <span className="achievement-date">{achievement.year}</span>
-                {achievement.isCertCard && (
-                  <button
-                    type="button"
-                    onClick={scrollToCerts}
-                    className="ach-jump-certs-btn"
-                    title="Jump to certificates gallery"
-                  >
-                    Explore {certsCount} Certificates ↓
-                  </button>
-                )}
-                {achievement.isTypingCard && (
-                  <button
-                    type="button"
-                    onClick={scrollToTyping}
-                    className="ach-jump-certs-btn"
-                    title="Jump to typing records section"
-                  >
-                    Explore Typing Records ↓
-                  </button>
-                )}
-                {achievement.isDsaCard && (
-                  <button
-                    type="button"
-                    onClick={scrollToLeetcode}
-                    className="ach-jump-certs-btn"
-                    title="Jump to LeetCode section"
-                  >
-                    Explore LeetCode Stats ↓
-                  </button>
-                )}
-              </div>
-
-              {achievement.links && (
-                <div className="achievement-links">
-                  {achievement.links.map((link, i) => (
-                    <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="achievement-link" title={link.title || link.type}>
-                      {iconMap[link.type]}
-                    </a>
-                  ))}
+        <motion.div className="achievements-grid" layout transition={{ duration: 0.3 }}>
+          <AnimatePresence initial={false}>
+            {visibleAchievements.map((achievement, index) => (
+              <motion.article
+                key={achievement.title}
+                className={`achievement-card ${achievement.isCertCard ? 'achievement-card-certs' : ''}`}
+                layout
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                transition={{ duration: 0.35, delay: index >= INITIAL_ACHIEVEMENTS_COUNT ? (index - INITIAL_ACHIEVEMENTS_COUNT) * 0.08 : 0 }}
+                whileHover={{ y: -4, boxShadow: '0 0 30px rgba(0, 212, 255, 0.12)' }}
+              >
+                <div className="achievement-badge">
+                  {achievement.badgeIcon || checkBadgeIcon}
                 </div>
-              )}
-            </motion.article>
-          ))}
-        </div>
+                <h3 className="achievement-title">{achievement.title}</h3>
+                <p className="achievement-description">{achievement.description}</p>
+                
+                <div className="achievement-meta-row">
+                  <span className="achievement-date">{achievement.year}</span>
+                  {achievement.isCertCard && (
+                    <button
+                      type="button"
+                      onClick={scrollToCerts}
+                      className="ach-jump-certs-btn"
+                      title="Jump to certificates gallery"
+                    >
+                      Explore {certsCount} Certificates ↓
+                    </button>
+                  )}
+                  {achievement.isTypingCard && (
+                    <button
+                      type="button"
+                      onClick={scrollToTyping}
+                      className="ach-jump-certs-btn"
+                      title="Jump to typing records section"
+                    >
+                      Explore Typing Records ↓
+                    </button>
+                  )}
+                  {achievement.isDsaCard && (
+                    <button
+                      type="button"
+                      onClick={scrollToLeetcode}
+                      className="ach-jump-certs-btn"
+                      title="Jump to LeetCode section"
+                    >
+                      Explore LeetCode Stats ↓
+                    </button>
+                  )}
+                </div>
+
+                {achievement.links && (
+                  <div className="achievement-links">
+                    {achievement.links.map((link, i) => (
+                      <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="achievement-link" title={link.title || link.type}>
+                        {iconMap[link.type]}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </motion.article>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Expand / Collapse Button */}
+        {displayAchievements.length > INITIAL_ACHIEVEMENTS_COUNT && (
+          <div className="ach-expand-wrapper">
+            <motion.button
+              type="button"
+              className="ach-expand-btn"
+              onClick={handleToggleExpand}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              aria-expanded={isExpanded}
+            >
+              <span className="ach-expand-icon">{isExpanded ? '▲' : '▼'}</span>
+              <span>
+                {isExpanded
+                  ? 'Show Less'
+                  : `+ Add More Achievements (${displayAchievements.length - INITIAL_ACHIEVEMENTS_COUNT})`}
+              </span>
+            </motion.button>
+          </div>
+        )}
 
         {/* Full 42 Certificates Interactive Showcase */}
         <CertificatesGallery />

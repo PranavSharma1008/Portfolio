@@ -1334,6 +1334,57 @@ body:hover .cursor-glow {
   height: 18px;
 }
 
+/* Achievements Expand / Collapse Button */
+.ach-expand-wrapper {
+  margin: 36px 0 28px;
+  display: flex;
+  justify-content: center;
+}
+
+.ach-expand-btn {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 8px;
+  background: rgba(0, 212, 255, 0.07);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  color: var(--cyan);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.08);
+}
+
+.ach-expand-btn:hover {
+  background: rgba(0, 212, 255, 0.18);
+  border-color: var(--cyan);
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.25);
+  transform: translateY(-2px);
+  color: #ffffff;
+}
+
+.ach-expand-icon {
+  font-size: 0.75rem;
+  transition: transform 0.25s ease;
+}
+
+.light .ach-expand-btn {
+  background: rgba(0, 150, 180, 0.08);
+  border-color: rgba(0, 150, 180, 0.35);
+  color: #007a99;
+  box-shadow: 0 4px 15px rgba(0, 150, 180, 0.1);
+}
+
+.light .ach-expand-btn:hover {
+  background: rgba(0, 150, 180, 0.18);
+  border-color: #007a99;
+  color: #004a5e;
+  box-shadow: 0 6px 20px rgba(0, 150, 180, 0.2);
+}
+
 /* ==========================================
    CONTACT SECTION
    ========================================== */
