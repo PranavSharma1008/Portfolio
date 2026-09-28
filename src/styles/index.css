@@ -1230,6 +1230,8 @@ body:hover .cursor-glow {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .achievement-card::before {
@@ -1285,6 +1287,7 @@ body:hover .cursor-glow {
   color: var(--text-secondary);
   line-height: 1.7;
   margin-bottom: 16px;
+  flex: 1;
 }
 
 .achievement-date {
@@ -1383,6 +1386,76 @@ body:hover .cursor-glow {
   border-color: #007a99;
   color: #004a5e;
   box-shadow: 0 6px 20px rgba(0, 150, 180, 0.2);
+}
+
+/* ==========================================
+   EXPANDED COMPACT ACHIEVEMENTS
+   Scales down cards so all achievements fit
+   neatly and comfortably when expanded
+   ========================================== */
+.achievements-grid.achievements-grid-expanded {
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+@media (min-width: 900px) {
+  .achievements-grid.achievements-grid-expanded {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.achievements-grid.achievements-grid-expanded .achievement-card {
+  padding: 16px 18px;
+  border-radius: 7px;
+}
+
+.achievements-grid.achievements-grid-expanded .achievement-badge {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.achievements-grid.achievements-grid-expanded .achievement-badge svg {
+  width: 18px;
+  height: 18px;
+}
+
+.achievements-grid.achievements-grid-expanded .achievement-title {
+  font-size: 0.92rem;
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+
+.achievements-grid.achievements-grid-expanded .achievement-description {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.achievements-grid.achievements-grid-expanded .achievement-meta-row {
+  gap: 8px;
+}
+
+.achievements-grid.achievements-grid-expanded .achievement-date {
+  font-size: 0.74rem;
+  padding: 3px 8px;
+}
+
+.achievements-grid.achievements-grid-expanded .ach-jump-certs-btn {
+  font-size: 0.72rem;
+  padding: 3px 8px;
+}
+
+.achievements-grid.achievements-grid-expanded .achievement-links {
+  margin-top: 10px;
+  padding-top: 10px;
+  gap: 8px;
+}
+
+.achievements-grid.achievements-grid-expanded .achievement-link svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* ==========================================

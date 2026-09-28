@@ -293,7 +293,11 @@ const Achievements = () => {
           Achievements
         </motion.h2>
 
-        <motion.div className="achievements-grid" layout transition={{ duration: 0.3 }}>
+        <motion.div
+          className={`achievements-grid ${isExpanded ? 'achievements-grid-expanded' : ''}`}
+          layout
+          transition={{ duration: 0.35, ease: 'easeInOut' }}
+        >
           <AnimatePresence initial={false}>
             {visibleAchievements.map((achievement, index) => (
               <motion.article
