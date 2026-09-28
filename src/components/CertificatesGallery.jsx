@@ -81,14 +81,14 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     return counts
   }, [allCertificates])
 
-  // Dynamic available categories: "All" first, then "Hackathons", then other categories
+  // Dynamic available categories: "All" first, then other categories (Hackathons tab permanently excluded)
   const availableCategories = useMemo(() => {
-    const baseList = ['All', 'Hackathons']
-    const seen = new Set(baseList)
+    const baseList = ['All']
+    const seen = new Set(['All', 'Hackathons'])
     const list = [...baseList]
 
     CERTIFICATE_CATEGORIES.forEach((cat) => {
-      if (!seen.has(cat)) {
+      if (cat !== 'Hackathons' && !seen.has(cat)) {
         seen.add(cat)
         list.push(cat)
       }
@@ -97,7 +97,7 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
     allCertificates.forEach((c) => {
       if (c && c.category && typeof c.category === 'string') {
         const cat = c.category.trim()
-        if (!seen.has(cat)) {
+        if (cat !== 'Hackathons' && !seen.has(cat)) {
           seen.add(cat)
           list.push(cat)
         }
@@ -135,20 +135,23 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
       }
     }
 
-    // Priority-first sorting: Hackathon certificates ALWAYS show first, followed by other credentials
+    // Priority-first sorting: Hackathon certificates ALWAYS show first at the top, followed by other credentials
     return [...dedupedList].sort((a, b) => {
-      const aIsHack = a.category === 'Hackathons' || a.isHackathon
-      const bIsHack = b.category === 'Hackathons' || b.isHackathon
+      const aIsHack = a.category === 'Hackathons' || a.isHackathon || a.repoName === GITHUB_HACK_REPO_NAME
+      const bIsHack = b.category === 'Hackathons' || b.isHackathon || b.repoName === GITHUB_HACK_REPO_NAME
       if (aIsHack && !bIsHack) return -1
       if (!aIsHack && bIsHack) return 1
       return (b.priority ?? 50) - (a.priority ?? 50)
     })
   }, [allCertificates, activeCategory, searchQuery])
 
-  // Displayed certificates
+  // Displayed certificates (Show 9 in "All" view initially, or all when expanded)
   const displayedCertificates = useMemo(() => {
+    if (activeCategory === 'All' && !searchQuery && !isExpanded) {
+      return filteredCertificates.slice(0, 9)
+    }
     return filteredCertificates
-  }, [filteredCertificates])
+  }, [filteredCertificates, activeCategory, searchQuery, isExpanded])
 
   const handleOpenModal = (indexInFiltered) => {
     setSelectedCertIndex(indexInFiltered)
@@ -180,30 +183,18 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
         <div className="certs-header-left">
           <div className="certs-terminal-prompt">
             <span className="prompt-prefix">pranav@portfolio:~$</span>
-            <span className="prompt-cmd">
-              {activeCategory === 'Hackathons'
-                ? 'git pull origin/hack-certificates'
-                : 'git pull origin/certificates'}
-            </span>
+            <span className="prompt-cmd">git pull origin/certificates</span>
             <a
-              href={activeCategory === 'Hackathons' ? GITHUB_HACK_REPO_URL : GITHUB_REPO_URL}
+              href={GITHUB_REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="github-repo-link"
-              title={
-                activeCategory === 'Hackathons'
-                  ? 'Open Hack-Certficates repository on GitHub'
-                  : 'Open Certificates repository on GitHub'
-              }
+              title="Open Certificates repository on GitHub"
             >
               <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
               </svg>
-              <span>
-                {activeCategory === 'Hackathons'
-                  ? 'PranavSharma1008/Hack-Certficates ↗'
-                  : 'PranavSharma1008/Certificates ↗'}
-              </span>
+              <span>PranavSharma1008/Certificates ↗</span>
             </a>
           </div>
 
@@ -424,29 +415,15 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
         </motion.div>
       ) : (
         <div className="certs-empty-state">
-          <div className="empty-icon">{activeCategory === 'Hackathons' ? '🏆' : '📂'}</div>
+          <div className="empty-icon">📂</div>
           <p>
             {searchQuery
               ? `No certificates found matching "${searchQuery}" in ${activeCategory}`
-              : activeCategory === 'Hackathons'
-              ? 'No hackathon certificates found in repository currently. Newly added certificates on GitHub will sync automatically here.'
               : `No certificates found in ${activeCategory}`}
           </p>
-          {activeCategory === 'Hackathons' && !searchQuery && (
-            <a
-              href={GITHUB_HACK_REPO_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cmd-btn"
-              style={{ marginTop: '10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              <span>View GitHub Hack-Certficates Repo ↗</span>
-            </a>
-          )}
           <button
             type="button"
             className="cmd-btn"
-            style={{ marginTop: activeCategory === 'Hackathons' && !searchQuery ? '8px' : '0' }}
             onClick={() => {
               setSearchQuery('')
               setActiveCategory('All')
@@ -454,6 +431,37 @@ const CertificatesGallery = ({ initialExpanded = false }) => {
           >
             {searchQuery ? 'Clear Search' : 'View All Certificates'}
           </button>
+        </div>
+      )}
+
+      {/* Expand / Collapse "See More" Button */}
+      {activeCategory === 'All' && !searchQuery && filteredCertificates.length > 9 && (
+        <div className="certs-expand-wrapper">
+          <motion.button
+            type="button"
+            className="cmd-btn cmd-btn-primary certs-toggle-expand-btn"
+            onClick={() => {
+              if (isExpanded) {
+                setIsExpanded(false)
+                const el = document.getElementById('certificates-section')
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+              } else {
+                setIsExpanded(true)
+              }
+            }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            aria-expanded={isExpanded}
+          >
+            <span className="btn-icon">{isExpanded ? '▲' : '▼'}</span>
+            <span>
+              {isExpanded
+                ? 'Show Less'
+                : `See More Certificates (${filteredCertificates.length - 9} more)`}
+            </span>
+          </motion.button>
         </div>
       )}
 
