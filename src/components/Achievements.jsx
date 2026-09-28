@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import CertificatesGallery from './CertificatesGallery'
-import SihModal from './SihModal'
 import Code2ChillModal from './Code2ChillModal'
 import certificates from '../data/certificates'
 import { leetcodeInitialData } from '../data/leetcodeData'
@@ -148,7 +147,6 @@ const Achievements = () => {
   const [solvedCount, setSolvedCount] = useState(leetcodeInitialData.totalSolved)
   const [certsCount, setCertsCount] = useState(certificates.length)
   const [followersCount, setFollowersCount] = useState(DEFAULT_FOLLOWERS)
-  const [sihModalOpen, setSihModalOpen] = useState(false)
   const [c2cModalOpen, setC2cModalOpen] = useState(false)
 
   useEffect(() => {
@@ -293,16 +291,6 @@ const Achievements = () => {
               
               <div className="achievement-meta-row">
                 <span className="achievement-date">{achievement.year}</span>
-                {achievement.isSihCard && (
-                  <button
-                    type="button"
-                    onClick={() => setSihModalOpen(true)}
-                    className="ach-jump-certs-btn ach-jump-sih-btn"
-                    title="View SIH 2026 Selection Details & Certificate"
-                  >
-                    View Certificate / Proof ↗
-                  </button>
-                )}
                 {achievement.isC2cCard && (
                   <button
                     type="button"
@@ -360,12 +348,6 @@ const Achievements = () => {
 
         {/* Full 42 Certificates Interactive Showcase */}
         <CertificatesGallery />
-
-        {/* Smart India Hackathon 2026 Selection & Certificate Modal */}
-        <SihModal
-          isOpen={sihModalOpen}
-          onClose={() => setSihModalOpen(false)}
-        />
 
         {/* Code2Chill On Fire LeetCode Competition Modal */}
         <Code2ChillModal
