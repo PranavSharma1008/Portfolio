@@ -6,6 +6,7 @@ import {
   syncWithGitHubRepo,
   GITHUB_REPO_URL,
   GITHUB_HACK_REPO_URL,
+  GITHUB_HACK_REPO_NAME,
   CACHE_KEY
 } from '../lib/githubCertSync'
 
